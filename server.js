@@ -8,7 +8,7 @@ const db = require('./data/db');
 const app = express();
 const PORT = process.env.PORT || 5000;
 const PAYLINK_BASE_URL = process.env.PAYLINK_BASE_URL || 'https://paylinkapi-bot.onrender.com';
-const PAYLINK_API_KEY = process.env.PAYLINK_API_KEY || 'plk_live_std_792712df7dcc';
+const PAYLINK_API_KEY = process.env.PAYLINK_API_KEY;
 const ADMIN_IDS = (process.env.ADMIN_IDS || '6805487598,7283817695').split(',').map(id => id.trim());
 
 // Ensure public uploads directory exists

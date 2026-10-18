@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const db = require('./data/db');
 
-const BOT_TOKEN = process.env.BOT_TOKEN || '8803058122:AAE9EaxwJuPmtm9DL9QfosNdpqVzmXdpkbg';
+const BOT_TOKEN = process.env.BOT_TOKEN;
 const ADMIN_IDS = (process.env.ADMIN_IDS || '6805487598,7283817695').split(',').map(id => id.trim());
 const GROUP_ID = process.env.GROUP_ID || '-1003942921012';
 let WEBAPP_URL = process.env.WEBAPP_URL || 'http://localhost:5000';

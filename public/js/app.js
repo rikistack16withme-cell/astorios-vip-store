@@ -8,7 +8,7 @@
 // -------------------------------------------------------------
 const state = {
   products: [],
-  categories: ['VIP MOD', 'iOS ONLY', 'ANDROID', 'VPN FREE', 'E-SIGN', 'AIM HACK', 'TOOLS'],
+  categories: ['VIP MOD', 'iOS ONLY', 'ANDROID', 'VPN FREE', 'E-SIGN', 'VIP BOOSTER', 'TOOLS'],
   selectedCategory: 'ALL',
   selectedFilter: 'all',
   searchQuery: '',

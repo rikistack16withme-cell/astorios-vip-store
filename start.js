@@ -6,8 +6,8 @@ const { app, startServer, setBotInstance } = require('./server');
 const { initBot } = require('./bot');
 
 const PORT = process.env.PORT || 5000;
-const BOT_TOKEN = process.env.BOT_TOKEN || '8803058122:AAE9EaxwJuPmtm9DL9QfosNdpqVzmXdpkbg';
-const PRODUCTION_URL = 'https://astorrios.bymebank.xyz';
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const PRODUCTION_URL = process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz';
 
 let tunnelProcess = null;
 let botInstance = null;

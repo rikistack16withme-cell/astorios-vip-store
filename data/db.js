@@ -59,13 +59,13 @@ const INITIAL_DATA = {
     },
     {
       id: "prod_4",
-      name: "VPN AIM HACK iOS & Android",
-      category: "AIM HACK",
+      name: "VPN VIP GAMING PRO iOS & Android",
+      category: "VIP BOOSTER",
       platform: "iOS & Android",
       price: 0.49,
       badge: "រហ័ស (Instant)",
-      tag: "Auto Headshot",
-      description: "VIP Aim Hack ភ្ជាប់ជាមួយបច្ចេកវិទ្យា VPN Bypass ដកដង្ហើមស្រួល ក្បាល 100% កម្រិត VIP Pro Master។",
+      tag: "Ultra Performance",
+      description: "VIP Gaming Network Tool ភ្ជាប់ជាមួយបច្ចេកវិទ្យា VPN ដកដង្ហើមស្រួល កម្រិត VIP Pro Master។",
       image: "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?auto=format&fit=crop&w=600&q=80",
       groupLink: "https://t.me/+AstorrIOS_VIP_Group",
       keys: [
@@ -282,7 +282,7 @@ const db = {
   getCategories() {
     const data = readDb();
     if (!Array.isArray(data.categories) || data.categories.length === 0) {
-      data.categories = ['VIP MOD', 'iOS ONLY', 'ANDROID', 'VPN FREE', 'E-SIGN', 'AIM HACK', 'TOOLS'];
+      data.categories = ['VIP MOD', 'iOS ONLY', 'ANDROID', 'VPN FREE', 'E-SIGN', 'VIP BOOSTER', 'TOOLS'];
       writeDb(data);
     }
     return data.categories;
