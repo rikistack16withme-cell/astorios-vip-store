@@ -41,6 +41,12 @@ app.use(express.static(path.join(__dirname, 'public'), {
   }
 }));
 
+// Lightweight ping/health endpoint for UptimeRobot 24/7 keep-alive
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });
+});
+app.get('/ping', (req, res) => res.send('pong'));
+
 function saveBase64Image(dataUrl, prefix = 'prod') {
   if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) return dataUrl;
   try {
