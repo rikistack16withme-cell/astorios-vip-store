@@ -1,0 +1,17 @@
+tunnel: 20de1ade-8359-4765-aef5-0480997009eb
+credentials-file: C:\Users\TUF\.cloudflared\20de1ade-8359-4765-aef5-0480997009eb.json
+
+ingress:
+  - hostname: astorrios.bymebank.xyz
+    service: http://127.0.0.1:5000
+    originRequest:
+      connectTimeout: 30s
+  - hostname: api.bymebank.xyz
+    service: http://localhost:8080
+    originRequest:
+      connectTimeout: 30s
+  - hostname: bymebank.xyz
+    service: http://localhost:5173
+    originRequest:
+      connectTimeout: 30s
+  - service: http_status:404

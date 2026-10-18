@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="km">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AstorrIOS — VIP GAME & MOD STORE</title>
+
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Battambang & Nunito Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700;900&family=Nunito+Sans:wght@400;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Custom Purple VIP Cyberpunk Theme -->
+  <link rel="stylesheet" href="/css/style.css?v=20261018_30">
+
+  <style>
+    [x-cloak] {
+      display: none !important;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+      }
+
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(0);
+      }
+
+      to {
+        transform: translateY(100%);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+
+      to {
+        opacity: 0;
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+
+    .fade-out {
+      animation: fadeOut 0.2s ease-in forwards;
+    }
+
+    .qr-card {
+      box-shadow: rgba(0, 0, 0, 0.15) 0px 10px 25px 0px;
+    }
+
+    .dashed-line {
+      background: linear-gradient(90deg, rgba(128, 128, 128, 0.85) 65%, rgba(255, 255, 255, 0) 0px);
+      background-size: 15px 1.5px;
+      background-position: 50% 100%;
+      background-repeat: repeat-x;
+    }
+
+    .red-triangle {
+      border-left: 19.5px solid transparent;
+      border-top: 19.5px solid rgb(226, 26, 26);
+      height: 0;
+      width: 0;
+    }
+
+    .draggable-thumb {
+      width: 44px;
+      height: 4px;
+      background: white;
+      border-radius: 2px;
+    }
+
+    .no-select {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-notice hidden"></div>
+
+  <div class="app-container">
+
+    <!-- ========================================================
+         HEADER BAR
+         ======================================================== -->
+    <header class="app-header">
+      <div class="user-badge" id="btnProfileHeader">
+        <div class="user-avatar-wrap">
+          <img src="/assets/logo.jpg" alt="User Avatar" class="user-avatar" id="headerAvatar">
+          <span class="user-status-dot"></span>
+        </div>
+        <div class="user-meta">
+          <div class="flex items-center gap-1">
+            <span class="user-name" id="userNameLabel">Customer</span>
+            <span id="userResellerTag"
+              class="hidden text-[8px] bg-gradient-to-r from-amber-400 to-yellow-500 text-black px-1.5 py-0.2 rounded-md font-black shadow-xs tracking-wider">RESELLER</span>
+          </div>
+          <span class="user-balance" id="userBalanceLabel">$0.00</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn-reseller-header" id="btnHeaderReseller" onclick="handleResellerRequestClick()"
+          title="Reseller Program">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
+          </svg>
+          <span id="txtHeaderReseller">Reseller</span>
+        </button>
+        <button class="btn-topup" id="btnOpenDeposit" title="Deposit Balance">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span id="txtDeposit">ដាក់ប្រាក់</span>
+        </button>
+        <button class="btn-lang" id="btnToggleLang" title="Change Language">KH</button>
+        <button class="btn-admin-pill hidden" id="btnAdminNav" title="Admin Panel">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
+          </svg>
+          <span>Admin</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ========================================================
+         VIEW: STORE (DEFAULT)
+         ======================================================== -->
+    <main id="viewStore">
+
+      <!-- HERO BANNER (Matches AstorrIOS Logo & VIP Cyberpunk) -->
+      <section class="hero-banner">
+        <div class="hero-content">
+          <img src="/assets/logo.jpg" alt="AstorrIOS VIP STORE" class="hero-logo-img">
+          <div class="hero-text">
+            <div class="hero-pill-row">
+              <span class="hero-pill-tag">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                </svg>
+                <span>ASTORRIOS STORE</span>
+              </span>
+              <span class="hero-pill-badge">BOOYAH! READY</span>
+            </div>
+            <h1 class="hero-title flex items-center gap-1.5">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#fbbf24">
+                <path
+                  d="M12 23c-4.97 0-9-4.03-9-9 0-4.97 4.03-9 9-9 .69 0 1.35.08 2 .22-1.28 1.44-2 3.32-2 5.28 0 4.14 3.36 7.5 7.5 7.5 1.05 0 2.06-.22 2.97-.61-.94 3.33-3.99 5.61-7.47 5.61z" />
+              </svg>
+              <span>SAFE 100% & FASTER SERVICE</span>
+            </h1>
+            <p class="hero-sub">ផ្តល់ជូននូវទំនុកចិត្តធានាសុវត្ថិភាពជូននិងការOrderលឿនទិញភ្លាមបានភ្លាមទិញបាន24/7</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESELLER PROMO BANNER / CARD -->
+      <div id="resellerPromoCard"
+        class="mx-1 mb-3 bg-gradient-to-r from-[#190d38] via-[#210c47] to-[#190d38] border border-amber-500/40 rounded-2xl p-3 flex items-center justify-between shadow-lg shadow-purple-950/60">
+        <div class="flex items-center gap-2.5">
+          <div
+            class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-yellow-600 flex items-center justify-center shadow-md shrink-0 text-black">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <strong class="text-xs font-black text-white uppercase tracking-wide">កញ្ចប់ VIP Reseller</strong>
+              <span id="resellerStatusChip"
+                class="text-[9px] px-1.5 py-0.5 rounded font-bold bg-yellow-400/20 text-yellow-300 border border-yellow-400/30">តម្លៃបោះដុំ</span>
+            </div>
+            <p class="text-[10px] text-gray-300 mt-0.5" id="resellerStatusDesc">ចុចស្នើសុំដើម្បីទទួលបានតម្លៃពិសេស
+              Reseller លើគ្រប់ទំនិញ!</p>
+          </div>
+        </div>
+        <button type="button" id="btnRequestResellerHero" onclick="handleResellerRequestClick()"
+          class="shrink-0 bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-black font-extrabold text-[11px] px-3.5 py-2 rounded-xl shadow-md transition active:scale-95 flex items-center gap-1">
+          <span id="btnRequestResellerHeroText">ស្នើសុំ</span>
+          <span>❯</span>
+        </button>
+      </div>
+
+      <!-- CATEGORY PILLS (Horizontal Scroll with PC Wheel Support) -->
+      <nav class="category-scroll" id="categoryList">
+        <!-- Rendered dynamically by JavaScript with clean SVG icons -->
+      </nav>
+
+      <!-- SEARCH & FILTER ROW -->
+      <div class="search-filter-wrap">
+        <div class="search-input-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="searchInput" class="search-input" placeholder="ស្វែងរក VIP Mod / Product...">
+          <span class="count-chip" id="productCountBadge">0 មុខទំនិញ</span>
+        </div>
+
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-filter="all">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="12" r="10" />
+            </svg>
+            <span>ផលិតផលទាំងអស់</span>
+          </button>
+          <button class="filter-tab" data-filter="in_stock">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+            </svg>
+            <span>មានក្នុងស្តុក</span>
+          </button>
+          <button class="filter-tab" data-filter="hot">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+            <span>ពេញនិយម</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- PRODUCT GRID (2 COLUMNS MATCHING SCREENSHOT) -->
+      <section class="product-grid" id="productGrid">
+        <!-- Injected via JavaScript -->
+      </section>
+
+    </main>
+
+    <!-- ========================================================
+         VIEW: WALLET / DEPOSIT
+         ======================================================== -->
+    <main id="viewWallet" class="hidden py-4">
+      <div class="admin-card">
+        <h2 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="text-amber-400">
+            <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+            <line x1="2" y1="10" x2="22" y2="10"></line>
+          </svg>
+          <span>កាបូបប្រាក់ (AstorrIOS Wallet)</span>
+        </h2>
+        <p class="text-xs text-gray-300 mb-4">បញ្ចូលទឹកប្រាក់ក្នុងគណនីរបស់អ្នកតាមរយៈ KHQR ស្វ័យប្រវត្តិកាត់ប្រាក់ភ្លាមៗ។
+        </p>
+
+        <div class="bg-[#090514] p-4 rounded-xl border border-purple-500/30 text-center mb-4">
+          <span class="text-xs text-gray-400 block mb-1">សមតុល្យបច្ចុប្បន្ន</span>
+          <span class="text-3xl font-extrabold text-[#fbbf24]" id="walletBalanceNum">$0.00</span>
+        </div>
+
+        <label class="admin-label">ជ្រើសរើសចំនួនទឹកប្រាក់ ឬវាយបញ្ចូល៖</label>
+        <div class="grid grid-cols-4 gap-2 mb-4">
+          <button
+            class="btn-quick-amount bg-purple-900/40 border border-purple-500/30 text-white font-bold py-2 rounded-xl text-sm"
+            onclick="setDepositAmount(1)">$1.00</button>
+          <button
+            class="btn-quick-amount bg-purple-900/40 border border-purple-500/30 text-white font-bold py-2 rounded-xl text-sm"
+            onclick="setDepositAmount(3)">$3.00</button>
+          <button
+            class="btn-quick-amount bg-purple-900/40 border border-purple-500/30 text-white font-bold py-2 rounded-xl text-sm"
+            onclick="setDepositAmount(5)">$5.00</button>
+          <button
+            class="btn-quick-amount bg-purple-900/40 border border-purple-500/30 text-white font-bold py-2 rounded-xl text-sm"
+            onclick="setDepositAmount(10)">$10.00</button>
+        </div>
+
+        <div class="admin-input-group mb-4">
+          <input type="number" step="0.01" min="0.10" id="depositAmountInput"
+            class="admin-input text-lg font-bold text-center text-yellow-400" placeholder="0.00 USD" value="1.00">
+        </div>
+
+        <button class="btn-proceed-pay flex items-center justify-center gap-1.5" id="btnDepositPay">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+          </svg>
+          <span>បង្កើត KHQR បញ្ចូលប្រាក់</span>
+        </button>
+      </div>
+    </main>
+
+    <!-- ========================================================
+         VIEW: ORDER HISTORY & PURCHASED KEYS
+         ======================================================== -->
+    <main id="viewOrders" class="hidden py-4">
+      <div class="admin-card">
+        <h2 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="text-purple-400">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span>ប្រវត្តិការទិញរបស់ខ្ញុំ</span>
+        </h2>
+        <p class="text-xs text-gray-300 mb-4">រាល់ការទិញ និងតំណភ្ជាប់ VIP Group ត្រូវបានរក្សាទុកនៅទីនេះ។</p>
+
+        <div id="ordersContainer" class="space-y-3">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+    </main>
+
+    <!-- ========================================================
+         VIEW: SUPPORT & CONTACT
+         ======================================================== -->
+    <main id="viewSupport" class="hidden py-4">
+      <div class="admin-card">
+        <div class="text-center mb-4">
+          <img src="/assets/logo.jpg" alt="AstorrIOS"
+            class="w-16 h-16 rounded-2xl mx-auto mb-2 border-2 border-purple-500 shadow-lg shadow-purple-500/40">
+          <h2 class="text-lg font-bold text-white">AstorrIOS SUPPORT 24/7</h2>
+          <p class="text-xs text-gray-400">សេវាបម្រើអតិថិជន និងជំនួយបច្ចេកទេស ២៤ ម៉ោង</p>
+        </div>
+
+        <div class="space-y-3 mb-6">
+          <div onclick="handleResellerRequestClick()"
+            class="cursor-pointer flex items-center justify-between p-3.5 bg-gradient-to-r from-amber-950/40 via-purple-950/50 to-amber-950/40 border border-amber-500/40 rounded-xl hover:border-amber-400 transition shadow-md group">
+            <div class="flex items-center gap-3">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"
+                class="text-amber-400 group-hover:scale-110 transition">
+                <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
+              </svg>
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <strong class="text-sm text-yellow-300 block">ស្នើសុំធ្វើជា VIP Reseller</strong>
+                  <span id="supportResellerTag"
+                    class="text-[9px] bg-yellow-400/20 text-yellow-300 px-1.5 py-0.2 rounded font-bold border border-yellow-400/30">VIP
+                    Rate</span>
+                </div>
+                <span class="text-xs text-gray-400"
+                  id="supportResellerSub">ទទួលបានតម្លៃបោះដុំពិសេសសម្រាប់អ្នកលក់បន្ត</span>
+              </div>
+            </div>
+            <span class="text-yellow-400 font-bold group-hover:translate-x-1 transition">❯</span>
+          </div>
+
+          <a href="https://t.me/Yur1Uchiha" target="_blank"
+            class="flex items-center justify-between p-3.5 bg-purple-950/40 border border-purple-500/30 rounded-xl hover:border-purple-400 transition">
+            <div class="flex items-center gap-3">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                class="text-purple-400">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <div>
+                <strong class="text-sm text-white block">ទាក់ទង Admin ផ្ទាល់</strong>
+                <span class="text-xs text-gray-400">@Yur1Uchiha (Fast Response)</span>
+              </div>
+            </div>
+            <span class="text-purple-400 font-bold">❯</span>
+          </a>
+
+          <a href="https://t.me/rosangkornews" target="_blank"
+            class="flex items-center justify-between p-3.5 bg-purple-950/40 border border-purple-500/30 rounded-xl hover:border-purple-400 transition">
+            <div class="flex items-center gap-3">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                class="text-purple-400">
+                <path d="M22 2L11 13"></path>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+              <div>
+                <strong class="text-sm text-white block">AstorrIOS Official Channel</strong>
+                <span class="text-xs text-gray-400">ចូលរួម Channel ព័ត៌មាន & Updates (@rosangkornews)</span>
+              </div>
+            </div>
+            <span class="text-purple-400 font-bold">❯</span>
+          </a>
+
+          <div class="p-3.5 bg-purple-950/40 border border-purple-500/30 rounded-xl">
+            <div class="flex items-center gap-3">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                class="text-purple-400">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+              <div>
+                <strong class="text-sm text-white block">ការធានាលើផលិតផល</strong>
+                <p class="text-xs text-gray-300 mt-1">រាល់ទំនិញធានាការប្រើប្រាស់ 100%។ បើមានបញ្ហា Admin
+                  នឹងប្តូរជូនភ្លាមៗ។</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ========================================================
+         VIEW: ADMIN CONTROL CENTER (IN MINI APP)
+         ======================================================== -->
+    <main id="viewAdmin" class="hidden py-4">
+      <div class="admin-card">
+        <div class="flex items-center justify-between mb-3 border-b border-purple-500/20 pb-3">
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="text-yellow-400">
+              <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
+            </svg>
+            <span>Admin Control Center</span>
+          </h2>
+          <span class="text-xs bg-red-600/30 text-red-300 border border-red-500/40 px-2 py-0.5 rounded-md font-mono">ID:
+            Authorized</span>
+        </div>
+
+        <!-- Sub Tabs (Flex wrap so PC users never get stuck or need horizontal scroll) -->
+        <div class="flex flex-wrap gap-2 mb-4 border-b border-purple-500/20 pb-3">
+          <button id="adminSubtabBtnAdd"
+            class="admin-subtab active px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-600 text-white flex items-center gap-1.5 transition"
+            onclick="switchAdminTab('add')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>+ ទំនិញធម្មតា (Single Key)</span>
+          </button>
+          <button id="adminSubtabBtnAddTier"
+            class="admin-subtab px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-900/40 text-gray-300 hover:text-white flex items-center gap-1.5 transition"
+            onclick="switchAdminTab('addTier')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>+ ទំនិញ Tier (Duration Keys)</span>
+          </button>
+          <button id="adminSubtabBtnInventory"
+            class="admin-subtab px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-900/40 text-gray-300 hover:text-white flex items-center gap-1.5 transition"
+            onclick="switchAdminTab('inventory')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+              </path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            <span>គ្រប់គ្រងទំនិញ</span>
+          </button>
+          <button id="adminSubtabBtnCategories"
+            class="admin-subtab px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-900/40 text-gray-300 hover:text-white flex items-center gap-1.5 transition"
+            onclick="switchAdminTab('categories')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+              <line x1="7" y1="7" x2="7.01" y2="7"></line>
+            </svg>
+            <span>គ្រប់គ្រង Categories</span>
+          </button>
+          <button id="adminSubtabBtnBroadcast"
+            class="admin-subtab px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-900/40 text-gray-300 hover:text-white flex items-center gap-1.5 transition"
+            onclick="switchAdminTab('broadcast')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 2L11 13"></path>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            <span>ផ្សាយដំណឹង</span>
+          </button>
+          <button id="adminSubtabBtnStats"
+            class="admin-subtab px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-900/40 text-gray-300 hover:text-white flex items-center gap-1.5 transition"
+            onclick="switchAdminTab('stats')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span>ស្ថិតិ</span>
+          </button>
+          <button id="adminSubtabBtnResellers"
+            class="admin-subtab px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-900/40 text-gray-300 hover:text-white flex items-center gap-1.5 transition"
+            onclick="switchAdminTab('resellers')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Resellers</span>
+          </button>
+        </div>
+
+        <!-- Admin Tab 1: Add Single Product Form -->
+        <div id="adminTabAdd">
+          <div class="bg-purple-950/30 border border-purple-500/30 rounded-xl p-3 mb-3">
+            <div class="flex items-center gap-2 mb-1">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                class="text-purple-400">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <h3 class="text-sm font-bold text-white">បន្ថែមទំនិញធម្មតា (Single Key Product)</h3>
+            </div>
+            <p class="text-[10px] text-gray-400">សម្រាប់ទំនិញដែលមានតម្លៃតែមួយ និង License Keys ធម្មតា (ឧ. E-Sign VIP,
+              Account, VPN Pass, Tool Lifetime...)។ មិនបាច់បែងចែកតាមរយៈពេលទេ។</p>
+          </div>
+
+          <form id="adminProductForm" onsubmit="handleAdminAddProduct(event)">
+            <div class="admin-input-group">
+              <label class="admin-label">ឈ្មោះផលិតផល (Product Name) *</label>
+              <input type="text" id="newProdName" class="admin-input" placeholder="e.g. VIP AIM HACK iOS & Android"
+                required>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 mb-2">
+              <div class="admin-input-group">
+                <label class="admin-label">តម្លៃធម្មតា ($ Normal) *</label>
+                <input type="number" step="0.01" min="0.10" id="newProdPrice" class="admin-input" placeholder="0.99"
+                  required>
+              </div>
+              <div class="admin-input-group">
+                <label class="admin-label">តម្លៃ Reseller ($ VIP)</label>
+                <input type="number" step="0.01" min="0.01" id="newProdResellerPrice"
+                  class="admin-input text-yellow-400 font-bold" placeholder="0.50 (Optional)">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 mb-2">
+              <div class="admin-input-group">
+                <div class="flex justify-between items-center mb-1">
+                  <label class="admin-label m-0">ប្រភេទ (Category) *</label>
+                  <button type="button" onclick="quickAddCategoryPrompt('newProdCategory')"
+                    class="text-[10px] text-purple-400 hover:text-purple-300 font-bold flex items-center gap-0.5">
+                    <span>+ បង្កើតថ្មី</span>
+                  </button>
+                </div>
+                <select id="newProdCategory" class="admin-select">
+                  <!-- Dynamically populated from Categories -->
+                </select>
+              </div>
+              <div class="admin-input-group">
+                <label class="admin-label">Platform *</label>
+                <input type="text" id="newProdPlatform" class="admin-input" placeholder="e.g. iOS & Android"
+                  value="iOS & Android">
+              </div>
+            </div>
+
+            <div class="admin-input-group mb-2">
+              <label class="admin-label">Badge *</label>
+              <input type="text" id="newProdBadge" class="admin-input" placeholder="e.g. រហ័ស (Instant)"
+                value="រហ័ស (Instant)">
+            </div>
+
+            <div class="admin-input-group">
+              <div class="flex justify-between items-center mb-1">
+                <label class="admin-label m-0">រូបភាពទំនិញ (Product Image)</label>
+                <span class="text-[10px] text-purple-400 font-semibold flex items-center gap-1">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
+                  <span>Phone / PC Gallery</span>
+                </span>
+              </div>
+
+              <!-- Native file input positioned over upload box for 100% reliable trigger on iOS / Android / Desktop -->
+              <input type="hidden" id="newProdImage">
+
+              <div id="newProdUploadStage"
+                class="relative cursor-pointer border-2 border-dashed border-purple-500/40 hover:border-purple-400 bg-purple-950/20 hover:bg-purple-900/30 rounded-xl p-3 text-center transition flex flex-col items-center justify-center gap-1.5 mb-2 group overflow-hidden">
+                <input type="file" id="newProdFileInput" accept="image/*"
+                  class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                  onchange="handleProductImageFile(event)">
+
+                <div id="newProdUploadEmpty" class="flex flex-col items-center py-1 pointer-events-none">
+                  <div
+                    class="w-10 h-10 rounded-full bg-purple-900/50 border border-purple-500/40 flex items-center justify-center mb-1 group-hover:scale-105 transition shadow-md shadow-purple-900/40 text-purple-300">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                      </path>
+                      <circle cx="12" cy="13" r="4"></circle>
+                    </svg>
+                  </div>
+                  <strong class="text-xs text-white group-hover:text-purple-300 transition">ចុចទីនេះដើម្បី Upload
+                    រូបភាពពីទូរស័ព្ទ / PC</strong>
+                  <span class="text-[9px] text-gray-400">JPG, PNG, WEBP (ស្វ័យប្រវត្តិកាត់ទំហំ & រក្សាទុក)</span>
+                </div>
+
+                <!-- Preview Area when selected -->
+                <div id="newProdPreviewWrap" class="hidden w-full flex flex-col items-center relative z-30">
+                  <img id="newProdPreviewImg" src="" alt="Preview"
+                    class="w-28 h-28 object-cover rounded-xl border-2 border-purple-400 shadow-lg shadow-purple-500/30">
+                  <div class="flex items-center gap-2 mt-2">
+                    <span id="newProdUploadStatusText" class="text-[10px] text-emerald-400 font-bold">✓
+                      បានជ្រើសរើសរួចរាល់</span>
+                    <button type="button" onclick="event.stopPropagation(); removeProductImageUpload();"
+                      class="text-[9px] bg-red-600/60 hover:bg-red-600 text-white px-2 py-0.5 rounded border border-red-500/50 cursor-pointer">លុបចេញ
+                      (Remove)</button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="admin-input-group">
+              <label class="admin-label">តំណភ្ជាប់គ្រុប VIP (VIP Group Link)</label>
+              <input type="text" id="newProdGroupLink" class="admin-input" placeholder="https://t.me/..."
+                value="https://t.me/rosangkornews">
+            </div>
+
+            <div class="admin-input-group">
+              <label class="admin-label">ការពិពណ៌នាលម្អិត (Description)</label>
+              <textarea id="newProdDesc" class="admin-textarea"
+                placeholder="លក្ខណៈពិសេស, ការណែនាំប្រើប្រាស់..."></textarea>
+            </div>
+
+            <div class="admin-input-group" id="newProdSingleKeyGroup">
+              <label class="admin-label">License Keys សម្រាប់ស្តុក (១ បន្ទាត់ = ១ Key)</label>
+              <textarea id="newProdKeys" class="admin-textarea font-mono text-xs"
+                placeholder="ASTORR-KEY-1111&#10;ASTORR-KEY-2222&#10;ASTORR-KEY-3333"></textarea>
+            </div>
+
+            <button type="submit" class="btn-admin-submit mt-2 flex items-center justify-center gap-2">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>បញ្ចូលទំនិញធម្មតាភ្លាមៗ (Publish Single Product)</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Admin Tab 2: Add Tier Product -->
+        <div id="adminTabAddTier" class="hidden">
+          <div class="bg-purple-950/30 border border-yellow-500/30 rounded-xl p-3 mb-3">
+            <div class="flex items-center gap-2 mb-1">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                class="text-yellow-400">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <h3 class="text-sm font-bold text-yellow-400">បន្ថែមទំនិញ Tier / Duration (Key 1 ថ្ងៃ, 7 ថ្ងៃ, 30 ថ្ងៃ...)
+              </h3>
+            </div>
+            <p class="text-[10px] text-gray-300">ទំនិញប្រភេទនេះ គឺលក់ License Key តាមរយៈពេល (1 ថ្ងៃ, 3 ថ្ងៃ, 7 ថ្ងៃ, 30
+              ថ្ងៃ...) ដែលរយៈពេលនីមួយៗមានតម្លៃ និង License Keys សម្រាប់ស្តុកដាច់ដោយឡែកពីគ្នា!</p>
+          </div>
+          <form id="adminTierProductForm" onsubmit="handleAdminAddTierProduct(event)">
+            <div class="admin-input-group">
+              <label class="admin-label">ឈ្មោះផលិតផល (Product Name) *</label>
+              <input type="text" id="tierProdName" class="admin-input" placeholder="e.g. VIP AIM HACK iOS & Android"
+                required>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 mb-2">
+              <div class="admin-input-group">
+                <div class="flex justify-between items-center mb-1">
+                  <label class="admin-label m-0">ប្រភេទ (Category) *</label>
+                  <button type="button" onclick="quickAddCategoryPrompt('tierProdCategory')"
+                    class="text-[10px] text-purple-400 hover:text-purple-300 font-bold flex items-center gap-0.5">
+                    <span>+ បង្កើតថ្មី</span>
+                  </button>
+                </div>
+                <select id="tierProdCategory" class="admin-select">
+                  <!-- Dynamically populated -->
+                </select>
+              </div>
+              <div class="admin-input-group">
+                <label class="admin-label">Platform *</label>
+                <input type="text" id="tierProdPlatform" class="admin-input" placeholder="e.g. iOS & Android"
+                  value="iOS & Android">
+              </div>
+            </div>
+
+            <div class="admin-input-group mb-2">
+              <label class="admin-label">Badge *</label>
+              <input type="text" id="tierProdBadge" class="admin-input" placeholder="e.g. រហ័ស (Instant)"
+                value="រហ័ស (Instant)">
+            </div>
+
+            <div class="admin-input-group">
+              <div class="flex justify-between items-center mb-1">
+                <label class="admin-label m-0">រូបភាពទំនិញ (Product Image)</label>
+                <span class="text-[10px] text-purple-400 font-semibold flex items-center gap-1">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
+                  <span>Phone / PC Gallery</span>
+                </span>
+              </div>
+              <input type="hidden" id="tierProdImage">
+              <div id="tierProdUploadStage"
+                class="relative cursor-pointer border-2 border-dashed border-purple-500/40 hover:border-purple-400 bg-purple-950/20 hover:bg-purple-900/30 rounded-xl p-3 text-center transition flex flex-col items-center justify-center gap-1.5 mb-2 group overflow-hidden">
+                <input type="file" id="tierProdFileInput" accept="image/*"
+                  class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                  onchange="handleTierProductImageFile(event)">
+                <div id="tierProdUploadEmpty" class="flex flex-col items-center py-1 pointer-events-none">
+                  <div
+                    class="w-10 h-10 rounded-full bg-purple-900/50 border border-purple-500/40 flex items-center justify-center mb-1 group-hover:scale-105 transition shadow-md shadow-purple-900/40 text-purple-300">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                      </path>
+                      <circle cx="12" cy="13" r="4"></circle>
+                    </svg>
+                  </div>
+                  <strong class="text-xs text-white group-hover:text-purple-300 transition">ចុចទីនេះដើម្បី Upload
+                    រូបភាពពីទូរស័ព្ទ / PC</strong>
+                  <span class="text-[9px] text-gray-400">JPG, PNG, WEBP (ស្វ័យប្រវត្តិកាត់ទំហំ & រក្សាទុក)</span>
+                </div>
+                <div id="tierProdPreviewWrap" class="hidden w-full flex flex-col items-center relative z-30">
+                  <img id="tierProdPreviewImg" src="" alt="Preview"
+                    class="w-28 h-28 object-cover rounded-xl border-2 border-purple-400 shadow-lg shadow-purple-500/30">
+                  <div class="flex items-center gap-2 mt-2">
+                    <span id="tierProdUploadStatusText" class="text-[10px] text-emerald-400 font-bold">✓
+                      បានជ្រើសរើសរួចរាល់</span>
+                    <button type="button" onclick="event.stopPropagation(); removeTierProductImageUpload();"
+                      class="text-[9px] bg-red-600/60 hover:bg-red-600 text-white px-2 py-0.5 rounded border border-red-500/50 cursor-pointer">លុបចេញ
+                      (Remove)</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="admin-input-group">
+              <label class="admin-label">តំណភ្ជាប់គ្រុប VIP (VIP Group Link)</label>
+              <input type="text" id="tierProdGroupLink" class="admin-input" placeholder="https://t.me/..."
+                value="https://t.me/rosangkornews">
+            </div>
+
+            <div class="admin-input-group">
+              <label class="admin-label">ការពិពណ៌នាលម្អិត (Description)</label>
+              <textarea id="tierProdDesc" class="admin-textarea"
+                placeholder="លក្ខណៈពិសេស, ការណែនាំប្រើប្រាស់..."></textarea>
+            </div>
+
+            <!-- Tier Builder Section -->
+            <div class="admin-input-group border border-yellow-500/30 rounded-xl p-3 bg-yellow-950/10 mb-3">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold text-yellow-400 flex items-center gap-1.5">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    class="text-yellow-400">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span>រយៈពេល / Tiers (Duration & Keys) *</span>
+                </span>
+                <button type="button" onclick="addNewTierRow('tier')"
+                  class="text-[10px] bg-purple-600 hover:bg-purple-500 text-white font-bold px-2.5 py-1 rounded-lg border border-purple-400/40 flex items-center gap-1">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  <span>+ បន្ថែម Tier ថ្មី</span>
+                </button>
+              </div>
+
+              <!-- Quick Presets -->
+              <div class="flex flex-wrap items-center gap-1.5 mb-2.5 pb-2 border-b border-yellow-500/20">
+                <span class="text-[10px] text-gray-400 font-semibold mr-1">Duration គំរូ:</span>
+                <button type="button"
+                  onclick="addNewTierRow('tier', {name: '1 ថ្ងៃ (1 Day)', price: '0.99', resellerPrice: '0.50'})"
+                  class="text-[10px] bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded border border-yellow-500/30 transition">+
+                  1 ថ្ងៃ ($0.99)</button>
+                <button type="button"
+                  onclick="addNewTierRow('tier', {name: '3 ថ្ងៃ (3 Days)', price: '2.50', resellerPrice: '1.80'})"
+                  class="text-[10px] bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded border border-yellow-500/30 transition">+
+                  3 ថ្ងៃ ($2.50)</button>
+                <button type="button"
+                  onclick="addNewTierRow('tier', {name: '7 ថ្ងៃ (7 Days)', price: '4.99', resellerPrice: '3.50'})"
+                  class="text-[10px] bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded border border-yellow-500/30 transition">+
+                  7 ថ្ងៃ ($4.99)</button>
+                <button type="button"
+                  onclick="addNewTierRow('tier', {name: '30 ថ្ងៃ (30 Days)', price: '12.00', resellerPrice: '9.00'})"
+                  class="text-[10px] bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded border border-yellow-500/30 transition">+
+                  30 ថ្ងៃ ($12.00)</button>
+                <button type="button"
+                  onclick="addNewTierRow('tier', {name: 'ពេញមួយជីវិត (Lifetime)', price: '25.00', resellerPrice: '18.00'})"
+                  class="text-[10px] bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded border border-yellow-500/30 transition">+
+                  Lifetime ($25.00)</button>
+              </div>
+
+              <div id="tierProdTiersContainer" class="space-y-2.5">
+                <!-- Dynamic Tier rows injected here -->
+              </div>
+            </div>
+
+            <button type="submit"
+              class="btn-admin-submit mt-2 flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-extrabold shadow-lg shadow-yellow-500/20">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>បញ្ចូល Tier Product ថ្មីភ្លាមៗ (Publish Tier Product)</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Admin Tab 2: Inventory & Edit / Delete Products -->
+        <div id="adminTabInventory" class="hidden">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs text-gray-300 font-semibold" id="adminInventoryCount">ទំនិញទាំងអស់</span>
+            <button onclick="fetchProducts()"
+              class="text-[10px] text-purple-300 hover:text-white flex items-center gap-1 bg-purple-950/40 px-2 py-1 rounded border border-purple-500/30">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+              </svg>
+              <span>Refresh</span>
+            </button>
+          </div>
+          <div id="adminInventoryList" class="space-y-3">
+            <!-- Injected via JavaScript with Edit & Delete actions -->
+          </div>
+        </div>
+
+        <!-- Admin Tab 3: Category Management (View, Add, Edit, Delete) -->
+        <div id="adminTabCategories" class="hidden">
+          <div class="bg-purple-950/20 border border-purple-500/20 rounded-xl p-3 mb-4">
+            <h3 class="text-xs font-bold text-white mb-2 flex items-center gap-1.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>បន្ថែម Category ថ្មី (Add New Category)</span>
+            </h3>
+            <form onsubmit="handleAdminAddCategory(event)" class="flex gap-2">
+              <input type="text" id="newCategoryName" class="admin-input text-xs flex-1"
+                placeholder="ឧ. PUBG MOBILE, FREE FIRE..." required>
+              <button type="submit"
+                class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-md shadow-purple-900/30 flex items-center gap-1 shrink-0">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>បន្ថែម</span>
+              </button>
+            </form>
+          </div>
+
+          <h3 class="text-xs font-bold text-gray-300 mb-2 flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+              <line x1="7" y1="7" x2="7.01" y2="7"></line>
+            </svg>
+            <span>បញ្ជី Categories បច្ចុប្បន្ន</span>
+          </h3>
+          <div id="adminCategoryList" class="space-y-2">
+            <!-- Injected via JavaScript -->
+          </div>
+        </div>
+
+        <!-- Admin Tab 4: Broadcast -->
+        <div id="adminTabBroadcast" class="hidden">
+          <form onsubmit="handleAdminBroadcast(event)">
+            <label class="admin-label">សារផ្សាយដំណឹងទៅកាន់អ្នកប្រើប្រាស់ទាំងអស់ (Broadcast Message)</label>
+            <textarea id="broadcastTextInput" class="admin-textarea text-xs mb-3" rows="5"
+              placeholder="សួស្តីអតិថិជនទាំងអស់! ថ្ងៃនេះ AstorrIOS STORE មានប្រូម៉ូសិន..." required></textarea>
+
+            <div class="admin-input-group mb-4">
+              <div class="flex justify-between items-center mb-1">
+                <label class="admin-label m-0">រូបភាព Banner (Optional)</label>
+                <span class="text-[10px] text-purple-400 font-semibold flex items-center gap-1">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
+                  <span>Phone / PC Gallery</span>
+                </span>
+              </div>
+
+              <input type="hidden" id="broadcastPhotoInput">
+
+              <div id="broadcastUploadStage"
+                class="relative cursor-pointer border-2 border-dashed border-purple-500/40 hover:border-purple-400 bg-purple-950/20 hover:bg-purple-900/30 rounded-xl p-2.5 text-center transition flex flex-col items-center justify-center gap-1 mb-2 group overflow-hidden">
+                <input type="file" id="broadcastFileInput" accept="image/*"
+                  class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                  onchange="handleBroadcastFile(event)">
+                <div id="broadcastUploadEmpty" class="flex items-center justify-center gap-2 py-1 pointer-events-none">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    class="text-purple-300">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
+                  <span class="text-xs font-bold text-white group-hover:text-purple-300">ចុចជ្រើសរើស Banner ពី Phone /
+                    PC</span>
+                </div>
+                <div id="broadcastPreviewWrap" class="hidden w-full flex flex-col items-center relative z-30">
+                  <img id="broadcastPreviewImg" src="" alt="Banner Preview"
+                    class="w-full max-h-32 object-cover rounded-lg border border-purple-400 shadow-md">
+                  <button type="button" onclick="event.stopPropagation(); removeBroadcastUpload();"
+                    class="text-[9px] bg-red-600/60 hover:bg-red-600 text-white px-2 py-0.5 rounded border border-red-500/50 mt-1 cursor-pointer">លុប
+                    (Remove)</button>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-admin-submit flex items-center justify-center gap-2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 2L11 13"></path>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+              <span>ផ្សាយដំណឹងឥឡូវនេះ (Send Broadcast)</span>
+            </button>
+          </form>
+          <div id="broadcastStatus" class="mt-3 text-xs text-gray-300"></div>
+        </div>
+
+        <!-- Admin Tab 5: Stats -->
+        <div id="adminTabStats" class="hidden">
+          <div id="adminStatsContent" class="space-y-3">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <!-- Admin Tab 6: Reseller Management -->
+        <div id="adminTabResellers" class="hidden">
+          <div class="flex items-center justify-between mb-3 border-b border-purple-500/20 pb-2">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" class="text-amber-400">
+                  <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
+                </svg>
+                <span>បញ្ជី Resellers & សំណើរស្នើសុំ</span>
+              </h3>
+              <p class="text-[11px] text-gray-400">គ្រប់គ្រង ដកសិទ្ធិ (Remove) ឬអនុម័ត Reseller ក្នុង Mini App</p>
+            </div>
+            <button type="button" onclick="fetchAdminResellers()"
+              class="text-xs bg-purple-900/50 hover:bg-purple-800 text-purple-200 border border-purple-500/30 px-2.5 py-1 rounded-lg flex items-center gap-1 transition">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              <span>Refresh</span>
+            </button>
+          </div>
+
+          <div id="adminResellersList" class="space-y-2.5">
+            <!-- Rendered dynamically by JS -->
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div><!-- /.app-container -->
+
+  <!-- ========================================================
+       PRODUCT DETAIL MODAL
+       ======================================================== -->
+  <div id="productDetailModal" class="modal-overlay hidden" onclick="if(event.target===this) closeProductModal()">
+    <div class="modal-dialog">
+      <button class="modal-close-btn" onclick="closeProductModal()">&times;</button>
+
+      <div class="modal-header-hero">
+        <img id="modalDetailImg" src="/assets/logo.jpg" alt="Product Image">
+        <span class="badge-platform" id="modalDetailPlatform">iOS & Android</span>
+      </div>
+
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-xs font-bold text-purple-400" id="modalDetailCategory">VIP MOD</span>
+        <span class="text-xs font-bold text-emerald-400" id="modalDetailStock">● មានក្នុងស្តុក</span>
+      </div>
+
+      <h2 class="modal-detail-title" id="modalDetailTitle">DRIP WIRE for iOS & Android</h2>
+
+      <!-- Price Header Row (Shows big price matching user screenshot, clickable to buy base product) -->
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-1.5 p-1 rounded-xl transition cursor-pointer hover:bg-purple-950/40"
+          id="modalDetailPriceBox" onclick="selectModalTier('base')" title="ចុចទីនេះដើម្បីជ្រើសរើសទិញទំនិញដើម">
+          <span class="text-2xl font-black text-yellow-400" id="modalDetailPrice">$12.00</span>
+          <span class="text-xs text-gray-400" id="modalDetailCurrency">USD</span>
+          <span id="modalBaseSelectBadge"
+            class="hidden text-[10px] font-bold text-emerald-400 bg-emerald-950/70 border border-emerald-500/40 px-1.5 py-0.5 rounded">
+            ✓ ជ្រើសរើស
+          </span>
+        </div>
+        <div id="modalDetailResellerBadge" class="hidden">
+          <span
+            class="text-[9px] bg-gradient-to-r from-amber-400 to-yellow-500 text-black px-2 py-0.5 rounded font-black tracking-wider inline-flex items-center gap-1">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
+            </svg>
+            <span>VIP RESELLER</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- SELECT DURATION / រយៈពេល (Shown if product has tiers) -->
+      <div id="modalTierSection" class="tier-select-section hidden mb-2">
+        <div class="tier-section-title">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="text-yellow-400">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>SELECT DURATION / រយៈពេល:</span>
+        </div>
+        <div id="modalTierList" class="tier-select-grid">
+          <!-- Dynamic tier cards injected here -->
+        </div>
+      </div>
+
+      <!-- Quantity & Total bar (Matches user reference screenshot media_1792326589323.png) -->
+      <div id="modalQuantitySection"
+        class="flex items-center justify-between bg-black/50 border border-purple-500/30 rounded-xl px-3 py-2 mb-3 text-xs">
+        <div class="flex items-center gap-2 text-gray-200">
+          <span class="font-bold">ចំនួន (Quantity):</span>
+          <div
+            class="flex items-center border border-purple-500/40 rounded-lg overflow-hidden bg-black/60 shadow-inner">
+            <button type="button"
+              class="w-7 h-7 flex items-center justify-center text-gray-300 hover:text-white hover:bg-purple-900/50 text-sm font-black active:scale-90 transition select-none"
+              onclick="adjustModalQty(-1)">&minus;</button>
+            <input type="number" id="modalQtyInput" min="1" max="99" value="1"
+              class="w-10 h-7 bg-transparent text-center font-bold text-yellow-300 text-xs outline-none border-x border-purple-500/40"
+              onchange="onModalQtyChange(this.value)" oninput="onModalQtyChange(this.value)">
+            <button type="button"
+              class="w-7 h-7 flex items-center justify-center text-gray-300 hover:text-white hover:bg-purple-900/50 text-sm font-black active:scale-90 transition select-none"
+              onclick="adjustModalQty(1)">+</button>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-gray-400 font-semibold">Total / សរុប:</span>
+          <span id="modalTierSelectedTotal" class="text-base font-black text-yellow-400">$0.99</span>
+        </div>
+      </div>
+
+
+      <div
+        class="bg-purple-950/40 border border-purple-500/20 rounded-xl p-3 mb-4 text-xs text-gray-300 flex items-center gap-2.5">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          class="text-emerald-400 shrink-0">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        <span>ទូទាត់រហ័សតាម KHQR ទទួលបានភ្លាមៗ និងចូលគ្រុប VIP!</span>
+      </div>
+
+      <button class="btn-proceed-pay flex items-center justify-center gap-1.5" id="btnModalBuyNow">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+        </svg>
+        <span>ទិញឥឡូវនេះ (Buy Now)</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       ADMIN EDIT PRODUCT MODAL
+       ======================================================== -->
+  <div id="adminEditProductModal" class="modal-overlay hidden"
+    onclick="if(event.target===this) closeEditProductModal()">
+    <div class="modal-dialog max-w-sm">
+      <div class="flex items-center justify-between border-b border-purple-500/20 pb-3 mb-3">
+        <div class="flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="text-purple-400">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+          <h3 class="text-sm font-bold text-white">កែប្រែទំនិញ (Edit VIP Product)</h3>
+        </div>
+        <button type="button" class="text-gray-400 hover:text-white text-lg font-bold"
+          onclick="closeEditProductModal()">&times;</button>
+      </div>
+
+      <form id="adminEditProductForm" onsubmit="handleAdminSaveEditProduct(event)" class="space-y-2.5">
+        <input type="hidden" id="editProdId">
+
+        <div class="admin-input-group">
+          <label class="admin-label">ឈ្មោះផលិតផល (Product Name) *</label>
+          <input type="text" id="editProdName" class="admin-input text-xs" required>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div class="admin-input-group">
+            <label class="admin-label">តម្លៃធម្មតា ($ Normal) *</label>
+            <input type="number" step="0.01" min="0.10" id="editProdPrice"
+              class="admin-input text-xs font-bold text-yellow-400" required>
+          </div>
+          <div class="admin-input-group">
+            <label class="admin-label">តម្លៃ Reseller ($ VIP)</label>
+            <input type="number" step="0.01" min="0.01" id="editProdResellerPrice"
+              class="admin-input text-xs font-bold text-emerald-400" placeholder="0.50 (Optional)">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div class="admin-input-group">
+            <div class="flex justify-between items-center mb-1">
+              <label class="admin-label m-0">ប្រភេទ (Category) *</label>
+              <button type="button" onclick="quickAddCategoryPrompt('editProdCategory')"
+                class="text-[10px] text-purple-400 hover:text-purple-300 font-bold flex items-center gap-0.5">
+                <span>+ បង្កើតថ្មី</span>
+              </button>
+            </div>
+            <select id="editProdCategory" class="admin-select text-xs">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+          <div class="admin-input-group">
+            <label class="admin-label">Platform *</label>
+            <input type="text" id="editProdPlatform" class="admin-input text-xs" required>
+          </div>
+        </div>
+
+        <div class="admin-input-group">
+          <label class="admin-label">Badge *</label>
+          <input type="text" id="editProdBadge" class="admin-input text-xs" required>
+        </div>
+
+        <!-- Image upload with preview for Edit Modal -->
+        <div class="admin-input-group">
+          <div class="flex justify-between items-center mb-1">
+            <label class="admin-label m-0">ប្តូររូបភាព (Change Image)</label>
+            <span class="text-[10px] text-purple-400 font-semibold flex items-center gap-1">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+              <span>Phone / PC Gallery</span>
+            </span>
+          </div>
+          <input type="hidden" id="editProdImage">
+
+          <div
+            class="relative cursor-pointer border-2 border-dashed border-purple-500/40 hover:border-purple-400 bg-purple-950/20 hover:bg-purple-900/30 rounded-xl p-2 transition flex items-center justify-between gap-2 group overflow-hidden">
+            <input type="file" id="editProdFileInput" accept="image/*"
+              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+              onchange="handleEditProductImageFile(event)">
+            <div class="flex items-center gap-2 pointer-events-none">
+              <img id="editProdPreviewImg" src="/assets/logo.jpg" alt="Thumbnail"
+                class="w-10 h-10 rounded-lg object-cover border border-purple-400 shadow">
+              <div class="text-left">
+                <span
+                  class="text-[11px] font-bold text-white block group-hover:text-purple-300">ចុចប្តូររូបភាពថ្មី</span>
+                <span id="editProdUploadStatus" class="text-[9px] text-gray-400">JPG, PNG, WEBP</span>
+              </div>
+            </div>
+            <span
+              class="text-[10px] bg-purple-900/60 text-purple-300 px-2 py-1 rounded border border-purple-500/30 pointer-events-none">ជ្រើសរើស</span>
+          </div>
+        </div>
+
+        <div class="admin-input-group">
+          <label class="admin-label">VIP Group Link</label>
+          <input type="text" id="editProdGroupLink" class="admin-input text-xs">
+        </div>
+
+        <div class="admin-input-group">
+          <label class="admin-label">ការពិពណ៌នាលម្អិត (Description)</label>
+          <textarea id="editProdDesc" class="admin-textarea text-xs" rows="2"></textarea>
+        </div>
+
+        <!-- Edit Modal: Tier / Duration Toggle & Builder -->
+        <div class="admin-input-group border border-purple-500/30 rounded-xl p-3 bg-purple-950/30 mb-3">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="flex items-center gap-2 cursor-pointer m-0">
+              <input type="checkbox" id="editProdHasTiers"
+                class="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 cursor-pointer"
+                onchange="toggleTiersSection('edit')">
+              <span class="text-xs font-bold text-white flex items-center gap-1.5">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  class="text-yellow-400">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>បែងចែកតាមរយៈពេល (Duration / Tiers)</span>
+              </span>
+            </label>
+            <button type="button" id="editProdAddTierBtn" onclick="addNewTierRow('edit')"
+              class="hidden text-[10px] bg-purple-600 hover:bg-purple-500 text-white font-bold px-2.5 py-1 rounded-lg border border-purple-400/40 flex items-center gap-1">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>+ បន្ថែម Tier</span>
+            </button>
+          </div>
+          <p class="text-[10px] text-gray-400 mb-2">កែប្រែតម្លៃ ឬបន្ថែម License Key សម្រាប់ Tier នីមួយៗ។</p>
+
+          <div id="editProdTiersContainer" class="hidden space-y-2.5 pt-1">
+            <!-- Dynamic Tier rows injected here -->
+          </div>
+        </div>
+
+        <div class="admin-input-group" id="editProdSingleKeyGroup">
+          <label class="admin-label">License Keys សម្រាប់ស្តុក (១ បន្ទាត់ = ១ Key)</label>
+          <textarea id="editProdKeys" class="admin-textarea font-mono text-xs" rows="3"
+            placeholder="ASTORR-KEY-1111&#10;ASTORR-KEY-2222"></textarea>
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="closeEditProductModal()"
+            class="w-1/3 py-2 bg-purple-950/40 border border-purple-500/30 text-gray-300 hover:text-white rounded-xl text-xs font-bold transition">
+            បោះបង់
+          </button>
+          <button type="submit"
+            class="w-2/3 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-purple-900/40 flex items-center justify-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>រក្សាទុក (Save Updates)</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       CELEBRATION & KEY DELIVERY MODAL
+       ======================================================== -->
+  <div id="orderSuccessModal" class="modal-overlay hidden">
+    <div class="celebration-modal">
+      <div class="celebration-icon flex items-center justify-center">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+          class="text-white">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <h2 class="text-lg font-bold text-white mb-1">ការទូទាត់ជោគជ័យ!</h2>
+      <p class="text-xs text-emerald-400 font-semibold mb-3">PAYMENT VERIFIED & APPROVED</p>
+
+      <div class="bg-black/60 p-3 rounded-xl border border-purple-500/30 text-left text-xs mb-3 space-y-1">
+        <div class="flex justify-between">
+          <span class="text-gray-400">ទំនិញ៖</span>
+          <strong class="text-white" id="successProdTitle">DRIP WIRE VIP</strong>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-400">ទឹកប្រាក់៖</span>
+          <strong class="text-[#fbbf24]" id="successProdAmount">$0.99 USD</strong>
+        </div>
+      </div>
+
+      <div class="key-display-box" id="successKeyBox">
+        <span class="text-[10px] text-gray-400 block mb-1 flex items-center justify-center gap-1">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="text-purple-300">
+            <path d="M21 2l-2 2m-1.5 1.5L16 7m-1.5 1.5l-2 2M15 2l6 6-7 7H10v4H6v4H2v-6l10-10z"></path>
+          </svg>
+          <span>LICENSE KEY របស់អ្នក៖</span>
+        </span>
+        <div class="key-text" id="successLicenseKey">ASTORR-VIP-XXXX-XXXX</div>
+        <button class="btn-copy-key flex items-center justify-center gap-1.5" onclick="copyLicenseKey()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span>ចម្លង (Copy Key)</span>
+        </button>
+      </div>
+
+      <div class="space-y-2 mt-4">
+        <a id="successGroupBtn" href="https://t.me/+AstorrIOS_VIP_Group" target="_blank"
+          class="btn-proceed-pay flex items-center justify-center gap-2">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span>ចូលរួមគ្រុប VIP (Join VIP Group)</span>
+        </a>
+        <button class="w-full bg-purple-900/40 text-gray-300 text-xs py-2.5 rounded-xl border border-purple-500/30"
+          onclick="closeSuccessModal()">
+          បិទផ្ទាំងនេះ (Close)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       EXACT KHQR PAYMENT MODAL (REQUESTED TEMPLATE)
+       ======================================================== -->
+  <!-- ========================================================
+       EXACT COMPACT KHQR PAYMENT MODAL
+       ======================================================== -->
+  <div id="bakongModal"
+    class="hidden fixed z-[9999] inset-0 w-full h-full modal-backdrop flex items-center justify-center p-3 overflow-y-auto"
+    onclick="if(event.target===this) closeKhqrModal()">
+    <div
+      class="relative bg-white text-[rgb(8,27,55)] rounded-[22px] max-w-[275px] w-full shadow-2xl overflow-hidden font-['SF_Pro_Display',Battambang,Arial,sans-serif] select-none my-auto">
+
+      <!-- RED TOP HEADER WITH AUTHENTIC KHQR LOGO & CLOSE -->
+      <div class="bg-[rgb(226,26,26)] pt-2.5 pb-2 px-3 text-center relative flex flex-col items-center justify-center">
+        <!-- Top White Grab Bar Handle -->
+        <div class="w-10 h-1 bg-white/70 rounded-full mb-1.5"></div>
+
+        <!-- Official KHQR White SVG -->
+        <svg width="68" height="16" viewBox="0 0 60 14" fill="none" xmlns="http://www.w3.org/2000/svg" class="block">
+          <path
+            d="M39.006 5.19439V9.59764H34.5318C34.0729 9.59764 33.7288 9.2307 33.7288 8.80731V5.22264C33.7288 4.77103 34.1016 4.43231 34.5318 4.43231H38.1743C38.6619 4.40408 39.006 4.74278 39.006 5.19439Z"
+            fill="white" />
+          <path
+            d="M59.9717 6.97176H57.7345C57.7345 4.34676 55.5548 2.20159 52.8875 2.20159C50.7651 2.20159 48.9008 3.55645 48.2699 5.53225C48.1265 6.01209 48.0404 6.49192 48.0404 6.97176V13.9718H47.9831C46.7785 13.9718 45.8033 13.0121 45.8033 11.8266V6.97176H45.832C45.832 5.05241 46.6351 3.21773 48.0691 1.89112C49.3884 0.677406 51.1093 0 52.9162 0C56.8168 0 59.9717 3.13305 59.9717 6.97176Z"
+            fill="white" />
+          <path d="M59.9999 13.9718L56.845 14L56.0706 13.2379L54.3497 11.5444L51.9692 9.20166H55.1241L59.9999 13.9718Z"
+            fill="white" />
+          <path
+            d="M39.7517 11.7702H33.0117C32.1799 11.7702 31.5203 11.121 31.5203 10.3024V3.66936C31.5203 2.85081 32.1799 2.20159 33.0117 2.20159H39.7517C40.5834 2.20159 41.2431 2.85081 41.2431 3.66936V10.3024L43.4802 12.504V2.14515C43.4802 0.959671 42.505 0 41.3005 0H31.4629C30.2583 0 29.2832 0.959671 29.2832 2.14515V11.8266C29.2832 13.0121 30.2583 13.9718 31.4629 13.9718H41.9888L39.7517 11.7702Z"
+            fill="white" />
+          <path
+            d="M12.3614 14H9.20656L2.60996 7.47984V14H0V0H2.60996V6.2379L8.94843 0H12.046L5.16255 6.71772L12.3614 14Z"
+            fill="white" />
+          <path d="M24.1492 0H26.7018V14H24.1492V7.93145H16.8643V14H14.3117V0H16.8643V5.84273H24.1492V0Z"
+            fill="white" />
+        </svg>
+
+        <!-- Close Button -->
+        <button type="button" onclick="closeKhqrModal()"
+          class="absolute right-2 top-2 text-white/90 hover:text-white text-lg w-6 h-6 flex items-center justify-center font-bold transition">
+          &times;
+        </button>
+      </div>
+
+      <!-- Red Triangle Notch Cutout -->
+      <div class="flex justify-end">
+        <div class="red-triangle"></div>
+      </div>
+
+      <!-- Merchant & Amount Info -->
+      <div class="px-4 pt-1 pb-2">
+        <div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider text-center" id="khqrStoreLabel">
+          AstorrIOS STORE</div>
+
+        <div class="flex items-center justify-center gap-1.5 mt-0.5">
+          <span id="khqr-amount" class="text-2xl font-black text-[rgb(8,27,55)] tracking-tight">1.00</span>
+          <span class="text-xs font-bold text-gray-500">USD</span>
+        </div>
+
+        <!-- 1-Minute Expire Countdown Badge -->
+        <div
+          class="flex items-center justify-center gap-1.5 py-0.5 px-2.5 bg-red-50 text-red-600 rounded-full text-[10px] font-bold mt-1.5 border border-red-200/80 shadow-xs mx-auto w-fit">
+          <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
+          <span>ផុតកំណត់ក្នុង:</span>
+          <span id="khqrCountdown" class="font-mono font-extrabold text-red-600">01:00</span>
+        </div>
+      </div>
+
+      <!-- Dashed Line Divider -->
+      <div class="dashed-line h-[1.5px] w-[86%] mx-auto my-1"></div>
+
+      <!-- QR CODE CONTAINER WITH CENTER USD LOGO & STATES -->
+      <div class="px-4 py-2 flex flex-col items-center justify-center">
+        <div id="qrCodeStage"
+          class="relative w-[168px] h-[168px] flex items-center justify-center bg-white p-1 rounded-xl border border-gray-100 shadow-inner">
+
+          <!-- Background Subtle Watermark -->
+          <img src="https://checkout.payway.com.kh/images/usd-khqr-logo.svg" alt="KHQR Logo"
+            class="absolute w-20 h-20 opacity-5 pointer-events-none select-none" />
+
+          <!-- The QR Code Image -->
+          <img id="bakongQR" src="https://i.ibb.co/p6pnkWZj/image.png" alt="KHQR Code"
+            class="w-[160px] h-[160px] object-contain block mx-auto rounded" />
+
+          <!-- OFFICIAL USD LOGO IN CENTER OF QR CODE -->
+          <div id="khqrUsdCenterBadge"
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full p-1 shadow-md border border-gray-200 flex items-center justify-center z-10 pointer-events-none">
+            <img src="https://checkout.payway.com.kh/images/usd-khqr-logo.svg" alt="USD" class="w-6 h-6 object-contain"
+              onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 40 40\'><circle cx=\'20\' cy=\'20\' r=\'19\' fill=\'%23004085\' stroke=\'%23ffffff\' stroke-width=\'2\'/><text x=\'20\' y=\'26\' font-size=\'16\' font-family=\'Arial,sans-serif\' font-weight=\'bold\' fill=\'%23ffffff\' text-anchor=\'middle\'>$</text></svg>';" />
+          </div>
+
+          <!-- ANIMATED LOADING STATE OVERLAY -->
+          <div id="khqrLoadingState"
+            class="hidden absolute inset-0 bg-white/95 backdrop-blur-xs z-20 flex flex-col items-center justify-center rounded-xl p-2 transition-all">
+            <div class="w-8 h-8 border-[3px] border-red-200 border-t-red-600 rounded-full animate-spin mb-2"></div>
+            <span class="text-xs font-bold text-gray-800">កំពុងបង្កើត KHQR...</span>
+            <span class="text-[10px] text-gray-400">Generating QR...</span>
+          </div>
+
+          <!-- 1-MINUTE EXPIRED OVERLAY -->
+          <div id="khqrExpiredState"
+            class="hidden absolute inset-0 bg-white/95 backdrop-blur-xs z-20 flex flex-col items-center justify-center p-3 text-center rounded-xl">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              class="text-red-500 mb-1">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <strong class="text-xs text-red-600 font-bold block mb-0.5">QR Code ផុតកំណត់!</strong>
+            <span class="text-[10px] text-gray-500 mb-2 leading-tight">សុពលភាព 1 នាទីបានបញ្ចប់</span>
+            <button type="button" id="renewKhqrBtn" onclick="regenerateCurrentKhqr()"
+              class="bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold text-[10px] py-1.5 px-3 rounded-lg shadow-md transition flex items-center gap-1.5 cursor-pointer">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              <span>បង្កើត QR ថ្មី (Renew)</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Scan & Actions -->
+        <div class="text-center mt-2 w-full">
+          <p class="text-[11px] font-bold text-[rgb(8,27,55)] m-0">Scan to Pay</p>
+          <span class="text-[10px] text-gray-400 block -mt-0.5 mb-1.5">or</span>
+
+          <a id="downloadQRBtn" href="#" onclick="downloadKhqrImage(event)"
+            class="inline-flex items-center justify-center gap-1.5 py-1 px-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-cyan-600 font-semibold text-[11px] transition shadow-2xs">
+            <img src="https://checkout.payway.com.kh/images/download-icon-khqr.svg" alt="Download"
+              class="w-3.5 h-3.5" />
+            <span>Download QR</span>
+          </a>
+
+          <p class="text-[9px] text-gray-400 leading-[13px] max-w-[210px] mx-auto mt-2 mb-0">
+            Scan with ABA Mobile, Bakong or other Mobile Banking
+          </p>
+        </div>
+      </div>
+
+      <!-- FOOTER STRIP -->
+      <div class="bg-gray-50 py-1.5 text-center border-t border-gray-100">
+        <span class="text-[9px] text-gray-400 font-medium tracking-wide">@AstorrIOS_bot</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================
+       BOTTOM NAVIGATION BAR
+       ======================================================== -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="store" onclick="switchNavTab('store')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span class="nav-label-store">ហាង</span>
+    </button>
+
+    <button class="nav-item" data-tab="wallet" onclick="switchNavTab('wallet')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+        <line x1="2" y1="10" x2="22" y2="10"></line>
+      </svg>
+      <span class="nav-label-wallet">កាបូប</span>
+    </button>
+
+    <button class="nav-item" data-tab="orders" onclick="switchNavTab('orders')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+      <span class="nav-label-orders">ប្រវត្តិទិញ</span>
+    </button>
+
+    <button class="nav-item" data-tab="support" onclick="switchNavTab('support')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+        <path
+          d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z">
+        </path>
+      </svg>
+      <span class="nav-label-support">ជំនួយ</span>
+    </button>
+
+    <button class="nav-item hidden" id="navItemAdmin" data-tab="admin" onclick="switchNavTab('admin')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon
+          points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+        </polygon>
+      </svg>
+      <span>Admin</span>
+    </button>
+  </nav>
+
+  <!-- ========================================================
+       RESELLER REQUEST MODAL (TELL USER TO WAIT FOR ADMIN APPROVAL)
+       ======================================================== -->
+  <div id="resellerRequestModal" class="modal-overlay hidden" onclick="if(event.target===this) closeResellerModal()">
+    <div class="modal-dialog max-w-sm text-center">
+      <div
+        class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-yellow-500 via-amber-400 to-yellow-600 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-yellow-500/30 text-black">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
+        </svg>
+      </div>
+
+      <h3 class="text-base font-extrabold text-white mb-1" id="resellerModalTitle">ស្នើសុំធ្វើជា VIP Reseller</h3>
+      <p class="text-xs text-yellow-300 font-semibold mb-3" id="resellerModalSubtitle">សំណើត្រូវបានផ្ញើជូន Admin
+        រួចរាល់ហើយ!</p>
+
+      <div
+        class="p-3.5 bg-black/60 border border-purple-500/30 rounded-xl text-xs text-gray-200 text-left space-y-2.5 mb-4 leading-relaxed">
+        <div class="flex items-start gap-2.5">
+          <div class="text-amber-400 shrink-0 mt-0.5">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <div>
+            <strong class="text-white block">សូមរង់ចាំ Admin ពិនិត្យអនុម័ត (Approval)</strong>
+            <span class="text-[11px] text-gray-400">Admin នឹងពិនិត្យនិងអនុម័តគណនីរបស់អ្នកឱ្យបានឆាប់រហ័ស។</span>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-2.5">
+          <div class="text-emerald-400 shrink-0 mt-0.5">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </div>
+          <div>
+            <strong class="text-white block">អ្នកអាចបិទផ្ទាំងនេះបាន (You can close this tab)</strong>
+            <span class="text-[11px] text-gray-400">មិនចាំបាច់នៅរង់ចាំក្នុងផ្ទាំងនេះទេ អ្នកអាចបិទ Mini App
+              បានដោយសុវត្ថិភាព។</span>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-2.5">
+          <div class="text-purple-400 shrink-0 mt-0.5">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </div>
+          <div>
+            <strong class="text-white block">ការជូនដំណឹង (Telegram Notification)</strong>
+            <span class="text-[11px] text-gray-400">នៅពេល Admin អនុម័ត ប្រព័ន្ធ Bot នឹងផ្ញើសេចក្តីជូនដំណឹងទៅកាន់
+              Telegram របស់អ្នកភ្លាមៗ!</span>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" onclick="closeResellerModal()"
+        class="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 text-white font-bold rounded-xl text-xs transition shadow-lg shadow-purple-900/50">
+        យល់ព្រម (OK, Close)
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       WELCOME POPUP MODAL (Shows on app start)
+       ======================================================== -->
+  <div id="welcomeModal" class="modal-overlay" style="z-index:9999;"
+    onclick="if(event.target===this) closeWelcomeModal()">
+    <div class="modal-dialog max-w-sm"
+      style="animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; position:relative;">
+
+      <!-- Close X Button -->
+      <button type="button" onclick="closeWelcomeModal()"
+        style="position:absolute; top:12px; right:12px; z-index:10; width:28px; height:28px; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.5); border:1px solid rgba(168,85,247,0.4); border-radius:50%; color:#a78bfa; font-size:16px; cursor:pointer; transition:all 0.2s;"
+        onmouseover="this.style.background='rgba(168,85,247,0.3)';this.style.color='#fff'"
+        onmouseout="this.style.background='rgba(0,0,0,0.5)';this.style.color='#a78bfa'">&times;</button>
+
+      <!-- Logo & Header -->
+      <div
+        style="text-align:center; padding-bottom:12px; border-bottom:1px solid rgba(168,85,247,0.25); margin-bottom:14px;">
+        <div
+          style="display:inline-flex; align-items:center; justify-content:center; width:64px; height:64px; border-radius:16px; overflow:hidden; border:2px solid rgba(251,191,36,0.5); box-shadow:0 0 20px rgba(168,85,247,0.4); margin-bottom:10px;">
+          <img src="/assets/logo.jpg" alt="AstorrIOS" style="width:100%; height:100%; object-fit:cover;">
+        </div>
+        <h2
+          style="font-size:19px; font-weight:900; background:linear-gradient(135deg,#fbbf24,#f59e0b,#fbbf24); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:0 0 4px 0; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <span>AstorrIOS STORE</span>
+          <span
+            style="display:inline-block; animation:emojiBounce 1.5s infinite ease-in-out; font-size:20px; -webkit-text-fill-color:initial;">🎮</span>
+        </h2>
+        <p style="font-size:11.5px; color:#c084fc; font-weight:700; margin:0;">សេវាកម្មលឿនរហ័សទាន់ចិត្ត &
+          ទិញស្វ័យប្រវត្តិ ២៤/៧</p>
+      </div>
+
+      <!-- Welcome Message -->
+      <div style="margin-bottom:14px;">
+        <p
+          style="font-size:13px; font-weight:800; color:#e2e8f0; margin:0 0 10px 0; display:flex; align-items:center; gap:6px;">
+          <span style="display:inline-block; animation:emojiGlowPulse 1.8s infinite ease-in-out;">✨</span>
+          <span>Welcome to AstorrIOS!</span>
+        </p>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div
+            style="display:flex; align-items:center; gap:10px; background:rgba(16,10,36,0.65); border:1px solid rgba(250,204,21,0.3); border-radius:12px; padding:9px 12px; box-shadow:0 2px 10px rgba(0,0,0,0.3);">
+            <span
+              style="font-size:18px; flex-shrink:0; display:inline-block; animation:emojiBounce 1.5s infinite ease-in-out;">⚡️</span>
+            <span style="font-size:12px; color:#f8fafc; font-weight:700;"><strong>ទិញភ្លាមបានភ្លាម</strong> (instant
+              Service)</span>
+          </div>
+          <div
+            style="display:flex; align-items:center; gap:10px; background:rgba(16,10,36,0.65); border:1px solid rgba(52,211,153,0.3); border-radius:12px; padding:9px 12px; box-shadow:0 2px 10px rgba(0,0,0,0.3);">
+            <span
+              style="font-size:18px; flex-shrink:0; display:inline-block; animation:emojiGlowPulse 1.8s infinite ease-in-out;">🛡️</span>
+            <span style="font-size:12px; color:#f8fafc; font-weight:700;"><strong>សុវត្ថិភាពខ្ពស់ 100%</strong></span>
+          </div>
+          <div
+            style="display:flex; align-items:center; gap:10px; background:rgba(16,10,36,0.65); border:1px solid rgba(168,85,247,0.3); border-radius:12px; padding:9px 12px; box-shadow:0 2px 10px rgba(0,0,0,0.3);">
+            <span
+              style="font-size:18px; flex-shrink:0; display:inline-block; animation:emojiBounce 1.6s infinite ease-in-out 0.3s;">💳</span>
+            <span style="font-size:12px; color:#f8fafc; font-weight:700;"><strong>ទូទាត់រហ័សតាម KHQR</strong> (ABA,
+              Bakong & គ្រប់ធនាគារ)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Prompt Line -->
+      <div style="text-align:center; margin-bottom:12px;">
+        <span
+          style="font-size:11.5px; font-weight:800; color:#fde047; display:inline-flex; align-items:center; justify-content:center; gap:5px; text-shadow:0 0 10px rgba(250,204,21,0.4);">
+          <span style="display:inline-block; animation:emojiWiggle 1.2s infinite ease-in-out; font-size:15px;">👇</span>
+          <span>ចុចប៊ូតុង <strong>OPEN STORE</strong> ខាងក្រោមដើម្បីចូលទិញទំនិញ៖</span>
+        </span>
+      </div>
+
+      <!-- Enter Store Button with Dynamic Rainbow Gradient and Animated Emojis -->
+      <button type="button" onclick="closeWelcomeModal()"
+        style="width:100%; padding:13px 0; background:linear-gradient(135deg, #fbbf24, #f43f5e, #9333ea, #06b6d4, #fbbf24); background-size:300% 300%; animation:rainbowBtn 3.5s ease infinite; color:#ffffff; font-weight:900; font-size:14px; border:1px solid rgba(255,255,255,0.4); border-radius:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; text-shadow:0 1px 3px rgba(0,0,0,0.6); letter-spacing:0.3px; transition:all 0.25s;"
+        onmouseover="this.style.transform='translateY(-2px) scale(1.02)';"
+        onmouseout="this.style.transform='translateY(0) scale(1)';">
+        <span style="display:inline-block; animation:emojiBounce 1.4s infinite ease-in-out; font-size:18px;">🚀</span>
+        <span
+          style="display:inline-block; animation:emojiGlowPulse 1.8s infinite ease-in-out; font-size:18px;">🎮</span>
+        <span style="font-weight:900; text-transform:uppercase;">OPEN STORE (ចូលទិញទំនិញ)</span>
+        <span
+          style="display:inline-block; animation:emojiBounce 1.4s infinite ease-in-out 0.2s; font-size:18px;">⚡️</span>
+        <span
+          style="display:inline-block; animation:emojiGlowPulse 1.8s infinite ease-in-out 0.4s; font-size:18px;">✨</span>
+      </button>
+
+      <p style="text-align:center; font-size:9px; color:#6b7280; margin-top:10px; font-weight:600;">@AstorrIOS_bot</p>
+    </div>
+  </div>
+
+  <!-- Client Application Logic -->
+  <script src="/js/app.js?v=20261019_01"></script>
+</body>
+
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "astorrios-vip-store",
+  "version": "1.0.0",
+  "description": "AstorrIOS Telegram Mini App & VIP Key Store Bot",
+  "main": "start.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node start.js",
+    "bot": "node bot.js",
+    "server": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "node-telegram-bot-api": "^0.66.0",
+    "qrcode": "^1.5.4"
+  }
+}
