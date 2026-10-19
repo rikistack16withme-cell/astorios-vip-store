@@ -83,6 +83,11 @@ function setBotInstance(bot) {
 // Get Products Catalog
 app.get('/api/products', (req, res) => {
   try {
+    res.set({
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
     const products = db.getProducts().map(p => ({
       ...p,
       stockCount: Array.isArray(p.keys) ? p.keys.length : 0,
@@ -97,6 +102,11 @@ app.get('/api/products', (req, res) => {
 // Get Single Product
 app.get('/api/products/:id', (req, res) => {
   try {
+    res.set({
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
     const product = db.getProductById(req.params.id);
     if (!product) return res.status(404).json({ success: false, error: 'Product not found' });
     res.json({

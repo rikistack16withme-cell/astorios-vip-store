@@ -203,7 +203,9 @@ function initTelegram() {
 // -------------------------------------------------------------
 async function fetchProducts() {
   try {
-    const res = await fetch('/api/products');
+    const res = await fetch(`/api/products?_t=${Date.now()}`, {
+      cache: 'no-store'
+    });
     const data = await res.json();
     if (data.success && Array.isArray(data.products)) {
       state.products = data.products;
@@ -436,8 +438,17 @@ function openProductModal(prodId) {
   document.getElementById('modalDetailPlatform').textContent = p.platform || 'iOS & Android';
   document.getElementById('modalDetailCategory').textContent = p.category || 'VIP MOD';
   document.getElementById('modalDetailTitle').textContent = p.name;
+  const descBox = document.getElementById('modalDetailDescBox');
   const descEl = document.getElementById('modalDetailDesc');
-  if (descEl) descEl.textContent = p.description || '';
+  const descText = (p.description || '').trim();
+  if (descEl) descEl.textContent = descText;
+  if (descBox) {
+    if (descText) {
+      descBox.classList.remove('hidden');
+    } else {
+      descBox.classList.add('hidden');
+    }
+  }
 
   const isResellerUser = !!state.user.isReseller;
   const tierSection = document.getElementById('modalTierSection');
