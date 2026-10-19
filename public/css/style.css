@@ -903,10 +903,12 @@ body {
 
 .key-text {
   font-family: monospace;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   color: #a855f7;
   word-break: break-all;
+  white-space: pre-wrap;
+  line-height: 1.6;
 }
 
 .btn-copy-key {

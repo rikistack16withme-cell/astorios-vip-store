@@ -141,6 +141,10 @@ app.post('/api/purchase-with-wallet', async (req, res) => {
     // Send instant telegram delivery to customer
     if (telegramBot && telegramId) {
       try {
+        const keysListHtml = (Array.isArray(result.assignedKeys) && result.assignedKeys.length > 1)
+          ? `🔑 <b>License Keys VIP (${result.assignedKeys.length} Keys)៖</b>\n${result.assignedKeys.map((k, i) => `Key #${i + 1}: <code>${k}</code>`).join('\n')}`
+          : `🔑 <b>License Key VIP៖</b>\n<code>${result.assignedKey || 'N/A'}</code>`;
+
         const deliveryMessage = `
 🎉 <b>ការទិញទំនិញជោគជ័យ! / PURCHASE COMPLETED!</b>
 ━━━━━━━━━━━━━━━━━━━━━
@@ -149,8 +153,7 @@ app.post('/api/purchase-with-wallet', async (req, res) => {
 📦 <b>ទំនិញ៖</b> ${result.productName}
 💵 <b>កាត់ប្រាក់៖</b> -$${result.amount.toFixed(2)} USD
 💰 <b>សមតុល្យនៅសល់៖</b> $${result.remainingBalance.toFixed(2)} USD
-🔑 <b>License Key VIP៖</b>
-<code>${result.assignedKey}</code>
+${keysListHtml}
 
 👥 <b>ចូលរួមគ្រុប VIP៖</b>
 👉 <a href="${result.groupLink}">ចុចទីនេះដើម្បីចូលគ្រុប VIP</a>
@@ -171,13 +174,16 @@ app.post('/api/purchase-with-wallet', async (req, res) => {
         // Group Alert
         const GROUP_ID = process.env.GROUP_ID || '-1003942921012';
         if (GROUP_ID) {
+          const keysAlertHtml = (Array.isArray(result.assignedKeys) && result.assignedKeys.length > 1)
+            ? `🔑 <b>Keys បានចេញ (${result.assignedKeys.length} Keys)៖</b>\n${result.assignedKeys.map((k, i) => `Key #${i + 1}: <code>${k}</code>`).join('\n')}\n`
+            : `🔑 <b>Key បានចេញ៖</b> <code>${result.assignedKey}</code>\n`;
+
           const groupAlert = `
 🔔 <b>ការទិញជោគជ័យតាមកាបូប! / NEW WALLET PURCHASE</b>
 ━━━━━━━━━━━━━━━━━━━━━
 📦 <b>ទំនិញ៖</b> ${result.productName}
 💵 <b>តម្លៃ៖</b> $${result.amount.toFixed(2)} USD
-🔑 <b>Key បានចេញ៖</b> <code>${result.assignedKey}</code>
-👤 <b>អតិថិជន TG ID៖</b> <code>${telegramId}</code>
+${keysAlertHtml}👤 <b>អតិថិជន TG ID៖</b> <code>${telegramId}</code>
 💰 <b>សមតុល្យនៅសល់៖</b> $${result.remainingBalance.toFixed(2)} USD
 ━━━━━━━━━━━━━━━━━━━━━
 ⚡ <b>AstorrIOS STORE — Wallet System</b>
@@ -333,6 +339,7 @@ app.post('/api/check-payment', async (req, res) => {
       status: 'PAID',
       order: existingOrder,
       assignedKey: existingOrder ? existingOrder.assignedKey : null,
+      assignedKeys: existingOrder ? (existingOrder.assignedKeys || (existingOrder.assignedKey ? [existingOrder.assignedKey] : [])) : [],
       groupLink: existingOrder ? existingOrder.groupLink : null,
       productName: existingOrder ? existingOrder.productName : null
     });
@@ -347,6 +354,7 @@ app.post('/api/check-payment', async (req, res) => {
       status: 'PAID',
       order: existingOrder,
       assignedKey: existingOrder.assignedKey,
+      assignedKeys: existingOrder.assignedKeys || (existingOrder.assignedKey ? [existingOrder.assignedKey] : []),
       groupLink: existingOrder.groupLink,
       productName: existingOrder.productName
     });
@@ -388,6 +396,7 @@ app.post('/api/check-payment', async (req, res) => {
           status: 'PAID',
           order: completedOrder,
           assignedKey: completedOrder ? completedOrder.assignedKey : null,
+          assignedKeys: completedOrder ? (completedOrder.assignedKeys || (completedOrder.assignedKey ? [completedOrder.assignedKey] : [])) : [],
           groupLink: completedOrder ? completedOrder.groupLink : null,
           productName: completedOrder ? completedOrder.productName : null
         });
@@ -415,14 +424,17 @@ app.post('/api/check-payment', async (req, res) => {
             let replyButtons = [];
 
             if (isProductPurchase) {
+              const keysListHtml = (Array.isArray(completedOrder.assignedKeys) && completedOrder.assignedKeys.length > 1)
+                ? `🔑 <b>License Keys VIP (${completedOrder.assignedKeys.length} Keys)៖</b>\n${completedOrder.assignedKeys.map((k, i) => `Key #${i + 1}: <code>${k}</code>`).join('\n')}`
+                : `🔑 <b>License Key VIP៖</b>\n<code>${completedOrder.assignedKey || 'N/A'}</code>`;
+
               deliveryMessage = `
 🎉 <b>ការទូទាត់ទទួលបានជោគជ័យ! / PAYMENT RECEIVED!</b>
 ━━━━━━━━━━━━━━━━━━━━━
 🌟 <b>ហាង៖</b> AstorrIOS STORE
 📦 <b>ទំនិញ៖</b> ${completedOrder.productName}
 💵 <b>តម្លៃ៖</b> $${completedOrder.amount.toFixed(2)} USD
-🔑 <b>License Key VIP៖</b>
-<code>${completedOrder.assignedKey || 'N/A'}</code>
+${keysListHtml}
 
 👥 <b>ចូលរួមគ្រុប VIP៖</b>
 👉 <a href="${completedOrder.groupLink || 'https://t.me/rosangkornews'}">ចុចទីនេះដើម្បីចូលគ្រុប VIP</a>
@@ -466,12 +478,16 @@ app.post('/api/check-payment', async (req, res) => {
         // 2. Alert Admin Group (Sent ONLY ONCE)
         const GROUP_ID = process.env.GROUP_ID || '-1003942921012';
         if (GROUP_ID) {
+          const keysAlertHtml = (Array.isArray(completedOrder.assignedKeys) && completedOrder.assignedKeys.length > 1)
+            ? `🔑 <b>Keys បានចេញ (${completedOrder.assignedKeys.length} Keys)៖</b>\n${completedOrder.assignedKeys.map((k, i) => `Key #${i + 1}: <code>${k}</code>`).join('\n')}\n`
+            : `🔑 <b>Key បានចេញ៖</b> <code>${completedOrder.assignedKey}</code>\n`;
+
           const groupAlert = `
 🔔 <b>ការទូទាត់ជោគជ័យថ្មី! / NEW PAYMENT ALERT</b>
 ━━━━━━━━━━━━━━━━━━━━━
 ${isProductPurchase ? `📦 <b>ទំនិញ៖</b> ${completedOrder.productName}` : `💳 <b>ប្រតិបត្តិការ៖</b> បញ្ចូលទឹកប្រាក់កាបូប (Top-Up)`}
 💵 <b>ចំនួនទឹកប្រាក់៖</b> $${completedOrder.amount.toFixed(2)} USD
-${isProductPurchase ? `🔑 <b>Key បានចេញ៖</b> <code>${completedOrder.assignedKey}</code>\n` : ''}👤 <b>អតិថិជន TG ID៖</b> <code>${completedOrder.telegramId || 'WebApp User'}</code>
+${isProductPurchase ? keysAlertHtml : ''}👤 <b>អតិថិជន TG ID៖</b> <code>${completedOrder.telegramId || 'WebApp User'}</code>
 🧾 <b>Transaction ID៖</b> <code>${completedOrder.tranId}</code>
 ━━━━━━━━━━━━━━━━━━━━━
 ⚡ <b>AstorrIOS STORE — Auto Clearing System</b>
@@ -486,6 +502,7 @@ ${isProductPurchase ? `🔑 <b>Key បានចេញ៖</b> <code>${completedOr
         status: 'PAID',
         order: completedOrder,
         assignedKey: completedOrder ? completedOrder.assignedKey : null,
+        assignedKeys: completedOrder ? (completedOrder.assignedKeys || (completedOrder.assignedKey ? [completedOrder.assignedKey] : [])) : [],
         groupLink: completedOrder ? completedOrder.groupLink : null,
         productName: completedOrder ? completedOrder.productName : null
       });

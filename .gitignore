@@ -20,3 +20,7 @@ yarn-error.log*
 Thumbs.db
 .vscode/
 .idea/
+
+# Database
+data/database.json
+data/*.json

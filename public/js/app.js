@@ -2284,8 +2284,8 @@ function renderOrderHistory(orders) {
         </div>
         ${o.assignedKey ? `
           <div class="bg-purple-950/60 p-2 rounded-lg border border-dashed border-purple-500/40 text-[11px] font-mono text-purple-300 flex items-center justify-between">
-            <span class="select-all">${escapeHtml(o.assignedKey)}</span>
-            <button class="text-[10px] bg-purple-700/60 text-white px-2 py-0.5 rounded" onclick="navigator.clipboard.writeText('${escapeHtml(o.assignedKey)}'); showToast('Copied!');">Copy</button>
+            <span class="select-all" style="white-space: pre-wrap; word-break: break-all;">${escapeHtml(o.assignedKey)}</span>
+            <button class="text-[10px] bg-purple-700/60 text-white px-2 py-0.5 rounded shrink-0 ml-2" onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent.trim()); showToast('Copied!');">Copy</button>
           </div>
         ` : ''}
       </div>

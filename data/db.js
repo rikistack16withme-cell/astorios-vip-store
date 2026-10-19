@@ -107,6 +107,7 @@ const INITIAL_DATA = {
       createdAt: new Date().toISOString()
     }
   ],
+  categories: ['VIP MOD', 'iOS ONLY', 'ANDROID', 'VPN FREE', 'E-SIGN', 'VIP BOOSTER', 'TOOLS'],
   users: {},
   orders: [],
   settings: {
@@ -119,6 +120,10 @@ const INITIAL_DATA = {
 
 function readDb() {
   try {
+    const dir = path.dirname(DB_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
     if (!fs.existsSync(DB_FILE)) {
       fs.writeFileSync(DB_FILE, JSON.stringify(INITIAL_DATA, null, 2), 'utf-8');
       return JSON.parse(JSON.stringify(INITIAL_DATA));
@@ -398,12 +403,14 @@ const db = {
       tierId: order.tierId || null,
       tierName: order.tierName || null,
       productName: order.productName || 'VIP Item',
+      quantity: Math.max(1, parseInt(order.quantity) || 1),
       amount: parseFloat(order.amount) || 0,
       status: 'PENDING',
       tranId: order.tranId || '',
       md5: order.md5 || '',
       qrString: order.qrString || '',
       assignedKey: null,
+      assignedKeys: [],
       groupLink: order.groupLink || '',
       createdAt: new Date().toISOString(),
       paidAt: null
@@ -440,10 +447,18 @@ const db = {
     // Consume key(s) from product / tier if available
     if (order.productId) {
       const product = (data.products || []).find(p => p.id === order.productId);
-      if (product) {
-        const qty = Math.max(1, parseInt(order.quantity) || 1);
-        const assignedKeys = [];
+      let qty = Math.max(1, parseInt(order.quantity) || 1);
+      // Fallback: if quantity was not set or 1, check productName for ' x[number]'
+      if (qty === 1 && order.productName) {
+        const match = order.productName.match(/x\s*(\d+)/i);
+        if (match && parseInt(match[1])) {
+          qty = parseInt(match[1]);
+        }
+      }
+      order.quantity = qty;
+      const assignedKeys = [];
 
+      if (product) {
         if (order.tierId && order.tierId !== 'base' && Array.isArray(product.tiers)) {
           const tier = product.tiers.find(t => t.id === order.tierId);
           if (tier && Array.isArray(tier.keys)) {
@@ -456,15 +471,15 @@ const db = {
             assignedKeys.push(product.keys.shift());
           }
         }
-
-        while (assignedKeys.length < qty) {
-          assignedKeys.push(`ASTORR-VIP-GEN-${Math.random().toString(36).substring(2, 10).toUpperCase()}`);
-        }
-
-        order.assignedKeys = assignedKeys;
-        order.assignedKey = assignedKeys.join('\n');
         order.groupLink = product.groupLink || order.groupLink;
       }
+
+      while (assignedKeys.length < qty) {
+        assignedKeys.push(`ASTORR-VIP-GEN-${Math.random().toString(36).substring(2, 10).toUpperCase()}`);
+      }
+
+      order.assignedKeys = assignedKeys;
+      order.assignedKey = assignedKeys.join('\n');
     } else {
       // Wallet deposit
       if (order.telegramId) {
