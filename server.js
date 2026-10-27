@@ -158,12 +158,12 @@ ${keysListHtml}
 👥 <b>ចូលរួមគ្រុប VIP៖</b>
 👉 <a href="${result.groupLink}">ចុចទីនេះដើម្បីចូលគ្រុប VIP</a>
 ━━━━━━━━━━━━━━━━━━━━━
-💬 បើមានបញ្ហា សូមទាក់ទង Admin: @Yur1Uchiha
+💬 បើមានបញ្ហា សូមទាក់ទង Admin: @AstorrIOS
 សូមអរគុណសម្រាប់ការគាំទ្រ <b>AstorrIOS</b>! ⚡
         `;
         const replyButtons = [
           [{ text: '👥 ចូលរួមគ្រុប VIP', url: result.groupLink }],
-          [{ text: '💬 ទាក់ទង Admin', url: 'https://t.me/Yur1Uchiha' }]
+          [{ text: '💬 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS' }]
         ];
 
         telegramBot.sendMessage(telegramId, deliveryMessage, {
@@ -372,19 +372,49 @@ app.post('/api/check-payment', async (req, res) => {
   inFlightChecks.add(tranId);
 
   try {
-    // Call PayLinkAPI web check
-    const response = await fetch(`${PAYLINK_BASE_URL}/api/web/check-payment`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ tranId, md5 })
-    });
+    // Call PayLinkAPI check with API Key authentication
+    let result = null;
+    let isPaid = false;
 
-    const result = await response.json();
-    console.log(`[PayLinkAPI] Check status (${tranId}):`, result);
+    try {
+      const response = await fetch(`${PAYLINK_BASE_URL}/api/payment/check`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${PAYLINK_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ tranId, md5 })
+      });
+      result = await response.json().catch(() => null);
+      if (result) {
+        isPaid = result.status === 'PAID' || result.paid === true || result.status === 'SUCCESS';
+      }
+    } catch (errCheck) {
+      console.warn(`[PayLinkAPI] Primary check error (${tranId}):`, errCheck.message);
+    }
 
-    const isPaid = result.status === 'PAID' || result.paid === true || result.status === 'SUCCESS';
+    // Secondary Fallback Check: /api/bakong/check-payment if primary check is still pending
+    if (!isPaid && (md5 || tranId)) {
+      try {
+        const bakongRes = await fetch(`${PAYLINK_BASE_URL}/api/bakong/check-payment`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${PAYLINK_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ tranId, md5 })
+        });
+        const bakongData = await bakongRes.json().catch(() => null);
+        if (bakongData && (bakongData.status === 'PAID' || bakongData.paid === true || bakongData.status === 'SUCCESS')) {
+          result = bakongData;
+          isPaid = true;
+        }
+      } catch (errBakong) {
+        console.warn(`[PayLinkAPI] Bakong fallback check error:`, errBakong.message);
+      }
+    }
+
+    console.log(`[PayLinkAPI] Check status (${tranId}):`, result, `isPaid: ${isPaid}`);
 
     if (isPaid) {
       // Re-check lock right before execution
@@ -439,12 +469,12 @@ ${keysListHtml}
 👥 <b>ចូលរួមគ្រុប VIP៖</b>
 👉 <a href="${completedOrder.groupLink || 'https://t.me/rosangkornews'}">ចុចទីនេះដើម្បីចូលគ្រុប VIP</a>
 ━━━━━━━━━━━━━━━━━━━━━
-💬 បើមានបញ្ហា សូមទាក់ទង Admin: @Yur1Uchiha
+💬 បើមានបញ្ហា សូមទាក់ទង Admin: @AstorrIOS
 សូមអរគុណសម្រាប់ការគាំទ្រ <b>AstorrIOS</b>! ⚡
               `;
               replyButtons = [
                 [{ text: '👥 ចូលរួមគ្រុប VIP', url: completedOrder.groupLink || 'https://t.me/rosangkornews' }],
-                [{ text: '💬 ទាក់ទង Admin', url: 'https://t.me/Yur1Uchiha' }]
+                [{ text: '💬 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS' }]
               ];
             } else {
               // Top-Up Wallet
@@ -462,7 +492,7 @@ ${keysListHtml}
               `;
               replyButtons = [
                 [{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' } }],
-                [{ text: '💬 👑 ទាក់ទង Admin', url: 'https://t.me/Yur1Uchiha' }]
+                [{ text: '💬 👑 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS' }]
               ];
             }
 
@@ -880,13 +910,13 @@ app.post('/api/admin/remove-reseller', checkAdmin, async (req, res) => {
 សួស្តី! Admin បានដកសិទ្ធិ (Revoke) គណនី <b>VIP Reseller</b> របស់អ្នករួចរាល់ហើយ។
 ចាប់ពីពេលនេះទៅ តម្លៃទំនិញក្នុងគណនីរបស់អ្នកនឹងត្រឡប់មកតម្លៃធម្មតាវិញ។
 ━━━━━━━━━━━━━━━━━━━━━
-💬 ប្រសិនបើមានចម្ងល់ សូមទាក់ទង Admin: @Yur1Uchiha
+💬 ប្រសិនបើមានចម្ងល់ សូមទាក់ទង Admin: @AstorrIOS
         `;
         telegramBot.sendMessage(telegramId, revokeMsg, {
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: '💬 👑 ទាក់ទង Admin (@Yur1Uchiha)', url: 'https://t.me/Yur1Uchiha' }],
+              [{ text: '💬 👑 ទាក់ទង Admin (@AstorrIOS)', url: 'https://t.me/AstorrIOS' }],
               [{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' } }]
             ]
           }
@@ -922,7 +952,7 @@ app.post('/api/admin/approve-reseller', checkAdmin, async (req, res) => {
           reply_markup: {
             inline_keyboard: [
               [{ text: '🚀 💎 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 (មើលតម្លៃ Reseller) ✨', web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' } }],
-              [{ text: '💬 👑 ទាក់ទង Admin', url: 'https://t.me/Yur1Uchiha' }]
+              [{ text: '💬 👑 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS' }]
             ]
           }
         }).catch(err => console.error('Approve notice TG error:', err.message));
@@ -950,13 +980,13 @@ app.post('/api/admin/reject-reseller', checkAdmin, async (req, res) => {
 ━━━━━━━━━━━━━━━━━━━━━
 សួស្តី! Admin បាន Cancel/បដិសេធសំណើសុំធ្វើជា Reseller របស់អ្នកក្នុងពេលនេះ។
 💬 ប្រសិនបើអ្នកមានចម្ងល់ ឬចង់សាកសួរលក្ខខណ្ឌបន្ថែម សូមទាក់ទង Admin ដោយផ្ទាល់៖
-👉 <b>Admin Contact៖</b> @Yur1Uchiha
+👉 <b>Admin Contact៖</b> @AstorrIOS
         `;
         telegramBot.sendMessage(telegramId, userNotice, {
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: '💬 👑 ទាក់ទង Admin (@Yur1Uchiha)', url: 'https://t.me/Yur1Uchiha' }],
+              [{ text: '💬 👑 ទាក់ទង Admin (@AstorrIOS)', url: 'https://t.me/AstorrIOS' }],
               [{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' } }]
             ]
           }

@@ -112,7 +112,7 @@ const INITIAL_DATA = {
   orders: [],
   settings: {
     storeName: "AstorrIOS STORE",
-    adminContact: "https://t.me/Yur1Uchiha",
+    adminContact: "https://t.me/AstorrIOS",
     vipGroup: "https://t.me/rosangkornews",
     supportKhmer: "016972470"
   }

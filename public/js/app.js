@@ -24,7 +24,7 @@ const state = {
   activeOrder: null,
   pollTimer: null,
   countdownTimer: null,
-  timeLeft: 60,
+  timeLeft: 180,
   isPaymentCompleted: false,
   isCheckInProgress: false,
   isPollingActive: false,
@@ -643,10 +643,10 @@ function preloadImage(url) {
 
 function startKhqrCountdown() {
   if (state.countdownTimer) clearInterval(state.countdownTimer);
-  state.timeLeft = 60;
+  state.timeLeft = 180;
 
   const countdownEl = document.getElementById('khqrCountdown');
-  if (countdownEl) countdownEl.textContent = '01:00';
+  if (countdownEl) countdownEl.textContent = '03:00';
 
   const expiredEl = document.getElementById('khqrExpiredState');
   if (expiredEl) expiredEl.classList.add('hidden');

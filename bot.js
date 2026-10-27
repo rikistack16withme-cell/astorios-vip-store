@@ -86,7 +86,7 @@ function initBot(webAppUrl) {
           : { text: '🚀 🎮 OPEN STORE ⚡️ ✨', web_app: { url: WEBAPP_URL }, style: 'success' }
       ],
       [
-        { text: '👑 💬 CONTACT ADMIN 💬 👑', url: 'https://t.me/Yur1Uchiha' }
+        { text: '👑 💬 CONTACT ADMIN 💬 👑', url: 'https://t.me/AstorrIOS' }
       ]
     ];
 
@@ -310,7 +310,7 @@ function initBot(webAppUrl) {
           reply_markup: {
             inline_keyboard: [
               [{ text: '🚀 💎 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 (មើលតម្លៃ Reseller) ✨', web_app: { url: WEBAPP_URL } }],
-              [{ text: '💬 👑 ទាក់ទង Admin', url: 'https://t.me/Yur1Uchiha' }]
+              [{ text: '💬 👑 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS' }]
             ]
           }
         });
@@ -357,14 +357,14 @@ function initBot(webAppUrl) {
 ━━━━━━━━━━━━━━━━━━━━━
 សួស្តី! Admin បាន Cancel/បដិសេធសំណើសុំធ្វើជា Reseller របស់អ្នកក្នុងពេលនេះ។
 💬 ប្រសិនបើអ្នកមានចម្ងល់ ឬចង់សាកសួរលក្ខខណ្ឌបន្ថែម សូមទាក់ទង Admin ដោយផ្ទាល់៖
-👉 <b>Admin Contact៖</b> @Yur1Uchiha
+👉 <b>Admin Contact៖</b> @AstorrIOS
         `;
 
         await bot.sendMessage(targetUserId, userNotice, {
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: '💬 👑 ទាក់ទង Admin (@Yur1Uchiha)', url: 'https://t.me/Yur1Uchiha' }],
+              [{ text: '💬 👑 ទាក់ទង Admin (@AstorrIOS)', url: 'https://t.me/AstorrIOS' }],
               [{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: WEBAPP_URL } }]
             ]
           }
