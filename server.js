@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const db = require('./data/db');
+const { tgEmoji } = require('./config/emojis');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -142,28 +143,28 @@ app.post('/api/purchase-with-wallet', async (req, res) => {
     if (telegramBot && telegramId) {
       try {
         const keysListHtml = (Array.isArray(result.assignedKeys) && result.assignedKeys.length > 1)
-          ? `🔑 <b>License Keys VIP (${result.assignedKeys.length} Keys)៖</b>\n${result.assignedKeys.map((k, i) => `Key #${i + 1}: <code>${k}</code>`).join('\n')}`
-          : `🔑 <b>License Key VIP៖</b>\n<code>${result.assignedKey || 'N/A'}</code>`;
+          ? `${tgEmoji('key')} <b>License Keys VIP (${result.assignedKeys.length} Keys)៖</b>\n${result.assignedKeys.map((k, i) => `Key #${i + 1}: <code>${k}</code>`).join('\n')}`
+          : `${tgEmoji('key')} <b>License Key VIP៖</b>\n<code>${result.assignedKey || 'N/A'}</code>`;
 
         const deliveryMessage = `
-🎉 <b>ការទិញទំនិញជោគជ័យ! / PURCHASE COMPLETED!</b>
+${tgEmoji('party')} <b>ការទិញទំនិញជោគជ័យ! / PURCHASE COMPLETED!</b>
 ━━━━━━━━━━━━━━━━━━━━━
-🌟 <b>ហាង៖</b> AstorrIOS STORE
-💳 <b>ទូទាត់តាម៖</b> សមតុល្យកាបូប (Wallet Balance)
-📦 <b>ទំនិញ៖</b> ${result.productName}
-💵 <b>កាត់ប្រាក់៖</b> -$${result.amount.toFixed(2)} USD
-💰 <b>សមតុល្យនៅសល់៖</b> $${result.remainingBalance.toFixed(2)} USD
+${tgEmoji('brand')} <b>ហាង៖</b> AstorrIOS STORE
+${tgEmoji('card')} <b>ទូទាត់តាម៖</b> សមតុល្យកាបូប (Wallet Balance)
+${tgEmoji('box')} <b>ទំនិញ៖</b> ${result.productName}
+${tgEmoji('money')} <b>កាត់ប្រាក់៖</b> -$${result.amount.toFixed(2)} USD
+${tgEmoji('cash')} <b>សមតុល្យនៅសល់៖</b> $${result.remainingBalance.toFixed(2)} USD
 ${keysListHtml}
 
-👥 <b>ចូលរួមគ្រុប VIP៖</b>
-👉 <a href="${result.groupLink}">ចុចទីនេះដើម្បីចូលគ្រុប VIP</a>
+${tgEmoji('users')} <b>ចូលរួមគ្រុប VIP៖</b>
+${tgEmoji('pointer')} <a href="${result.groupLink}">ចុចទីនេះដើម្បីចូលគ្រុប VIP</a>
 ━━━━━━━━━━━━━━━━━━━━━
-💬 បើមានបញ្ហា សូមទាក់ទង Admin: @AstorrIOS
-សូមអរគុណសម្រាប់ការគាំទ្រ <b>AstorrIOS</b>! ⚡
+${tgEmoji('support')} បើមានបញ្ហា សូមទាក់ទង Admin: @AstorrIOS
+សូមអរគុណសម្រាប់ការគាំទ្រ <b>AstorrIOS</b>! ${tgEmoji('lightning')}
         `;
         const replyButtons = [
-          [{ text: '👥 ចូលរួមគ្រុប VIP', url: result.groupLink }],
-          [{ text: '💬 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS' }]
+          [{ text: '👥 ចូលរួមគ្រុប VIP', url: result.groupLink, style: 'success' }],
+          [{ text: '💬 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS', style: 'primary' }]
         ];
 
         telegramBot.sendMessage(telegramId, deliveryMessage, {
@@ -455,44 +456,44 @@ app.post('/api/check-payment', async (req, res) => {
 
             if (isProductPurchase) {
               const keysListHtml = (Array.isArray(completedOrder.assignedKeys) && completedOrder.assignedKeys.length > 1)
-                ? `🔑 <b>License Keys VIP (${completedOrder.assignedKeys.length} Keys)៖</b>\n${completedOrder.assignedKeys.map((k, i) => `Key #${i + 1}: <code>${k}</code>`).join('\n')}`
-                : `🔑 <b>License Key VIP៖</b>\n<code>${completedOrder.assignedKey || 'N/A'}</code>`;
+                ? `${tgEmoji('key')} <b>License Keys VIP (${completedOrder.assignedKeys.length} Keys)៖</b>\n${completedOrder.assignedKeys.map((k, i) => `Key #${i + 1}: <code>${k}</code>`).join('\n')}`
+                : `${tgEmoji('key')} <b>License Key VIP៖</b>\n<code>${completedOrder.assignedKey || 'N/A'}</code>`;
 
               deliveryMessage = `
-🎉 <b>ការទូទាត់ទទួលបានជោគជ័យ! / PAYMENT RECEIVED!</b>
+${tgEmoji('party')} <b>ការទូទាត់ទទួលបានជោគជ័យ! / PAYMENT RECEIVED!</b>
 ━━━━━━━━━━━━━━━━━━━━━
-🌟 <b>ហាង៖</b> AstorrIOS STORE
-📦 <b>ទំនិញ៖</b> ${completedOrder.productName}
-💵 <b>តម្លៃ៖</b> $${completedOrder.amount.toFixed(2)} USD
+${tgEmoji('brand')} <b>ហាង៖</b> AstorrIOS STORE
+${tgEmoji('box')} <b>ទំនិញ៖</b> ${completedOrder.productName}
+${tgEmoji('money')} <b>តម្លៃ៖</b> $${completedOrder.amount.toFixed(2)} USD
 ${keysListHtml}
 
-👥 <b>ចូលរួមគ្រុប VIP៖</b>
-👉 <a href="${completedOrder.groupLink || 'https://t.me/rosangkornews'}">ចុចទីនេះដើម្បីចូលគ្រុប VIP</a>
+${tgEmoji('users')} <b>ចូលរួមគ្រុប VIP៖</b>
+${tgEmoji('pointer')} <a href="${completedOrder.groupLink || 'https://t.me/rosangkornews'}">ចុចទីនេះដើម្បីចូលគ្រុប VIP</a>
 ━━━━━━━━━━━━━━━━━━━━━
-💬 បើមានបញ្ហា សូមទាក់ទង Admin: @AstorrIOS
-សូមអរគុណសម្រាប់ការគាំទ្រ <b>AstorrIOS</b>! ⚡
+${tgEmoji('support')} បើមានបញ្ហា សូមទាក់ទង Admin: @AstorrIOS
+សូមអរគុណសម្រាប់ការគាំទ្រ <b>AstorrIOS</b>! ${tgEmoji('lightning')}
               `;
               replyButtons = [
-                [{ text: '👥 ចូលរួមគ្រុប VIP', url: completedOrder.groupLink || 'https://t.me/rosangkornews' }],
-                [{ text: '💬 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS' }]
+                [{ text: '👥 ចូលរួមគ្រុប VIP', url: completedOrder.groupLink || 'https://t.me/rosangkornews', style: 'success' }],
+                [{ text: '💬 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS', style: 'primary' }]
               ];
             } else {
               // Top-Up Wallet
               const currentUser = db.getUser(completedOrder.telegramId);
               const balanceText = currentUser ? `$${(currentUser.balance || 0).toFixed(2)} USD` : `$${completedOrder.amount.toFixed(2)} USD`;
               deliveryMessage = `
-🎉 <b>បញ្ចូលទឹកប្រាក់ជោគជ័យ! / TOP-UP COMPLETED!</b>
+${tgEmoji('party')} <b>បញ្ចូលទឹកប្រាក់ជោគជ័យ! / TOP-UP COMPLETED!</b>
 ━━━━━━━━━━━━━━━━━━━━━
-🌟 <b>ហាង៖</b> AstorrIOS STORE
-💳 <b>ប្រភេទ៖</b> បញ្ចូលសមតុល្យកាបូប (Wallet Deposit)
-💵 <b>ទឹកប្រាក់បានបញ្ចូល៖</b> +$${completedOrder.amount.toFixed(2)} USD
-💰 <b>សមតុល្យបច្ចុប្បន្ន៖</b> ${balanceText}
+${tgEmoji('brand')} <b>ហាង៖</b> AstorrIOS STORE
+${tgEmoji('card')} <b>ប្រភេទ៖</b> បញ្ចូលសមតុល្យកាបូប (Wallet Deposit)
+${tgEmoji('cash')} <b>ទឹកប្រាក់បានបញ្ចូល៖</b> +$${completedOrder.amount.toFixed(2)} USD
+${tgEmoji('money')} <b>សមតុល្យបច្ចុប្បន្ន៖</b> ${balanceText}
 ━━━━━━━━━━━━━━━━━━━━━
-✨ ទឹកប្រាក់ត្រូវបានបញ្ចូលទៅក្នុងគណនីរបស់អ្នករួចរាល់ហើយ! អ្នកអាចប្រើប្រាស់ដើម្បីទិញទំនិញ VIP បានភ្លាមៗ។
+${tgEmoji('sparkle')} ទឹកប្រាក់ត្រូវបានបញ្ចូលទៅក្នុងគណនីរបស់អ្នករួចរាល់ហើយ! អ្នកអាចប្រើប្រាស់ដើម្បីទិញទំនិញ VIP បានភ្លាមៗ។
               `;
               replyButtons = [
-                [{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' } }],
-                [{ text: '💬 👑 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS' }]
+                [{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' }, style: 'success' }],
+                [{ text: '💬 👑 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS', style: 'primary' }]
               ];
             }
 
@@ -625,8 +626,8 @@ app.post('/api/request-reseller', async (req, res) => {
       const keyboard = {
         inline_keyboard: [
           [
-            { text: '✅ អនុម័ត (Accept)', callback_data: `reseller_accept_${telegramId}` },
-            { text: '❌ Cancel Request', callback_data: `reseller_reject_${telegramId}` }
+            { text: '✅ អនុម័ត (Accept)', callback_data: `reseller_accept_${telegramId}`, style: 'success' },
+            { text: '❌ Cancel Request', callback_data: `reseller_reject_${telegramId}`, style: 'danger' }
           ]
         ]
       };
@@ -905,19 +906,19 @@ app.post('/api/admin/remove-reseller', checkAdmin, async (req, res) => {
     if (telegramBot && telegramId) {
       try {
         const revokeMsg = `
-⚠️ <b>សេចក្តីជូនដំណឹងអំពីគណនី Reseller</b>
+${tgEmoji('alert')} <b>សេចក្តីជូនដំណឹងអំពីគណនី Reseller</b>
 ━━━━━━━━━━━━━━━━━━━━━
 សួស្តី! Admin បានដកសិទ្ធិ (Revoke) គណនី <b>VIP Reseller</b> របស់អ្នករួចរាល់ហើយ។
 ចាប់ពីពេលនេះទៅ តម្លៃទំនិញក្នុងគណនីរបស់អ្នកនឹងត្រឡប់មកតម្លៃធម្មតាវិញ។
 ━━━━━━━━━━━━━━━━━━━━━
-💬 ប្រសិនបើមានចម្ងល់ សូមទាក់ទង Admin: @AstorrIOS
+${tgEmoji('support')} ប្រសិនបើមានចម្ងល់ សូមទាក់ទង Admin: @AstorrIOS
         `;
         telegramBot.sendMessage(telegramId, revokeMsg, {
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: '💬 👑 ទាក់ទង Admin (@AstorrIOS)', url: 'https://t.me/AstorrIOS' }],
-              [{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' } }]
+              [{ text: '💬 👑 ទាក់ទង Admin (@AstorrIOS)', url: 'https://t.me/AstorrIOS', style: 'primary' }],
+              [{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' }, style: 'success' }]
             ]
           }
         }).catch(err => console.error('Revoke notice TG error:', err.message));
@@ -941,18 +942,18 @@ app.post('/api/admin/approve-reseller', checkAdmin, async (req, res) => {
     if (telegramBot && telegramId) {
       try {
         const userNotice = `
-🎉 <b>អបអរសាទរ! សំណើ Reseller របស់អ្នកត្រូវបានអនុម័ត! (APPROVED)</b>
+${tgEmoji('party')} <b>អបអរសាទរ! សំណើ Reseller របស់អ្នកត្រូវបានអនុម័ត! (APPROVED)</b>
 ━━━━━━━━━━━━━━━━━━━━━
-🌟 គណនីរបស់អ្នកត្រូវបានដំឡើងជា <b>VIP Reseller</b> ផ្លូវការហើយ!
-💎 ចាប់ពីពេលនេះទៅ អ្នកនឹងទទួលបានតម្លៃពិសេស (Reseller Price) រាល់មុខទំនិញទាំងអស់ក្នុង AstorrIOS Store!
-⚡ រីករាយជាមួយការកុម្ម៉ង់ទំនិញក្នុងតម្លៃទាបបំផុត និងការដឹកជញ្ជូនរហ័ស ២៤/៧!
+${tgEmoji('crown')} គណនីរបស់អ្នកត្រូវបានដំឡើងជា <b>VIP Reseller</b> ផ្លូវការហើយ!
+${tgEmoji('diamond')} ចាប់ពីពេលនេះទៅ អ្នកនឹងទទួលបានតម្លៃពិសេស (Reseller Price) រាល់មុខទំនិញទាំងអស់ក្នុង AstorrIOS Store!
+${tgEmoji('lightning')} រីករាយជាមួយការកុម្ម៉ង់ទំនិញក្នុងតម្លៃទាបបំផុត និងការដឹកជញ្ជូនរហ័ស ២៤/៧!
         `;
         telegramBot.sendMessage(telegramId, userNotice, {
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: '🚀 💎 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 (មើលតម្លៃ Reseller) ✨', web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' } }],
-              [{ text: '💬 👑 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS' }]
+              [{ text: '🚀 💎 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 (មើលតម្លៃ Reseller) ✨', web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' }, style: 'success' }],
+              [{ text: '💬 👑 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS', style: 'primary' }]
             ]
           }
         }).catch(err => console.error('Approve notice TG error:', err.message));
@@ -976,18 +977,18 @@ app.post('/api/admin/reject-reseller', checkAdmin, async (req, res) => {
     if (telegramBot && telegramId) {
       try {
         const userNotice = `
-⚠️ <b>សេចក្តីជូនដំណឹងអំពីសំណើសុំធ្វើជា Reseller</b>
+${tgEmoji('alert')} <b>សេចក្តីជូនដំណឹងអំពីសំណើសុំធ្វើជា Reseller</b>
 ━━━━━━━━━━━━━━━━━━━━━
 សួស្តី! Admin បាន Cancel/បដិសេធសំណើសុំធ្វើជា Reseller របស់អ្នកក្នុងពេលនេះ។
-💬 ប្រសិនបើអ្នកមានចម្ងល់ ឬចង់សាកសួរលក្ខខណ្ឌបន្ថែម សូមទាក់ទង Admin ដោយផ្ទាល់៖
+${tgEmoji('support')} ប្រសិនបើអ្នកមានចម្ងល់ ឬចង់សាកសួរលក្ខខណ្ឌបន្ថែម សូមទាក់ទង Admin ដោយផ្ទាល់៖
 👉 <b>Admin Contact៖</b> @AstorrIOS
         `;
         telegramBot.sendMessage(telegramId, userNotice, {
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: '💬 👑 ទាក់ទង Admin (@AstorrIOS)', url: 'https://t.me/AstorrIOS' }],
-              [{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' } }]
+              [{ text: '💬 👑 ទាក់ទង Admin (@AstorrIOS)', url: 'https://t.me/AstorrIOS', style: 'primary' }],
+              [{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' }, style: 'success' }]
             ]
           }
         }).catch(err => console.error('Reject notice TG error:', err.message));

@@ -3,6 +3,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const path = require('path');
 const fs = require('fs');
 const db = require('./data/db');
+const { tgEmoji, stripTgEmoji, makeBtn } = require('./config/emojis');
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const ADMIN_IDS = (process.env.ADMIN_IDS || '6805487598,7283817695').split(',').map(id => id.trim());
@@ -51,26 +52,8 @@ function initBot(webAppUrl) {
   // -------------------------------------------------------------
   // Animated Telegram Emojis Configuration
   // -------------------------------------------------------------
-  const EMOJIS = {
-    game: process.env.EMOJI_GAME_ID || '5368324170671202286',
-    sparkle: process.env.EMOJI_SPARKLE_ID || '',
-    lightning: process.env.EMOJI_LIGHTNING_ID || '',
-    shield: process.env.EMOJI_SHIELD_ID || '',
-    card: process.env.EMOJI_CARD_ID || '',
-    down: process.env.EMOJI_DOWN_ID || '',
-    rocket: process.env.EMOJI_ROCKET_ID || ''
-  };
-
-  function formatTgEmoji(emojiId, char) {
-    if (emojiId && /^\d+$/.test(String(emojiId))) {
-      return `<tg-emoji emoji-id="${emojiId}">${char}</tg-emoji>`;
-    }
-    return char;
-  }
-
-  // Caption with Telegram Animated Custom Emojis (using verified IDs)
   function getAnimatedCaption() {
-    return `<b>AstorrIOS STORE ${formatTgEmoji(EMOJIS.game, '🎮')}</b>\nសេវាកម្មលឿនរហ័សទាន់ចិត្ត & ទិញស្វ័យប្រវត្តិ ២៤/៧\n\n${formatTgEmoji(EMOJIS.sparkle, '✨')} <b>Welcome to AstorrIOS!</b>\n• ${formatTgEmoji(EMOJIS.lightning, '⚡️')} <b>ទិញភ្លាមបានភ្លាម</b> (instant Service)\n• ${formatTgEmoji(EMOJIS.shield, '🛡️')} <b>សុវត្ថិភាពខ្ពស់ 100%</b>\n• ${formatTgEmoji(EMOJIS.card, '💳')} <b>ទូទាត់រហ័សតាម KHQR</b> (ABA, Bakong & គ្រប់ធនាគារ)\n\n${formatTgEmoji(EMOJIS.down, '👇')} ចុចប៊ូតុង <b>OPEN STORE</b> ខាងក្រោមដើម្បីចូលទិញទំនិញ៖`;
+    return `<b>AstorrIOS STORE ${tgEmoji('game')}</b>\nសេវាកម្មលឿនរហ័សទាន់ចិត្ត & ទិញស្វ័យប្រវត្តិ ២៤/៧\n\n${tgEmoji('sparkle')} <b>Welcome to AstorrIOS!</b>\n• ${tgEmoji('lightning')} <b>ទិញភ្លាមបានភ្លាម</b> (instant Service)\n• ${tgEmoji('shield')} <b>សុវត្ថិភាពខ្ពស់ 100%</b>\n• ${tgEmoji('card')} <b>ទូទាត់រហ័សតាម KHQR</b> (ABA, Bakong & គ្រប់ធនាគារ)\n\n${tgEmoji('down')} ចុចប៊ូតុង <b>OPEN STORE</b> ខាងក្រោមដើម្បីចូលទិញទំនិញ៖`;
   }
 
   // Standard Fallback Caption (Clean without tg-emoji)
@@ -86,13 +69,13 @@ function initBot(webAppUrl) {
           : { text: '🚀 🎮 OPEN STORE ⚡️ ✨', web_app: { url: WEBAPP_URL }, style: 'success' }
       ],
       [
-        { text: '👑 💬 CONTACT ADMIN 💬 👑', url: 'https://t.me/AstorrIOS' }
+        { text: '👑 💬 CONTACT ADMIN 💬 👑', url: 'https://t.me/AstorrIOS', style: 'primary' }
       ]
     ];
 
     if (isAdmin(userId)) {
       keyboard.push([
-        { text: '⚙️ ADMIN CONTROL PANEL', callback_data: 'admin_panel' }
+        { text: '⚙️ ADMIN CONTROL PANEL', callback_data: 'admin_panel', style: 'primary' }
       ]);
     }
 
@@ -218,29 +201,29 @@ function initBot(webAppUrl) {
     const stats = db.getStats();
     const isGroup = chatId < 0;
     const text = `
-👑 <b>AstorrIOS — ADMIN CONTROL CENTER</b>
+${tgEmoji('crown')} <b>AstorrIOS — ADMIN CONTROL CENTER</b>
 ━━━━━━━━━━━━━━━━━━━━━
-👥 <b>អតិថិជនសរុប (Users):</b> ${stats.totalUsers} នាក់
-📦 <b>ទំនិញក្នុងស្តុក (Products):</b> ${stats.totalProducts} មុខ
-🛒 <b>ការកុម្ម៉ង់សរុប (Orders):</b> ${stats.totalOrders}
-💵 <b>ចំណូលសរុប (Revenue):</b> $${stats.totalRevenue.toFixed(2)} USD
+${tgEmoji('users')} <b>អតិថិជនសរុប (Users):</b> ${stats.totalUsers} នាក់
+${tgEmoji('box')} <b>ទំនិញក្នុងស្តុក (Products):</b> ${stats.totalProducts} មុខ
+${tgEmoji('chart')} <b>ការកុម្ម៉ង់សរុប (Orders):</b> ${stats.totalOrders}
+${tgEmoji('money')} <b>ចំណូលសរុប (Revenue):</b> $${stats.totalRevenue.toFixed(2)} USD
 ━━━━━━━━━━━━━━━━━━━━━
 សូមជ្រើសរើសមុខងារខាងក្រោម៖
     `;
 
     const adminWebBtn = isGroup
-      ? { text: '🌐 បើក Admin WebApp', url: `https://t.me/${process.env.BOT_USERNAME || 'AstorrIOS_bot'}?start=admin` }
-      : { text: '🌐 បើក Admin WebApp', web_app: { url: `${WEBAPP_URL}?admin=true` } };
+      ? { text: '🌐 បើក Admin WebApp', url: `https://t.me/${process.env.BOT_USERNAME || 'AstorrIOS_bot'}?start=admin`, style: 'primary' }
+      : { text: '🌐 បើក Admin WebApp', web_app: { url: `${WEBAPP_URL}?admin=true` }, style: 'primary' };
 
     const markup = {
       inline_keyboard: [
         [
-          { text: '➕ បន្ថែមទំនិញថ្មី (Add Product)', callback_data: 'admin_add_prod' },
-          { text: '📦 បញ្ជីទំនិញ (Manage Products)', callback_data: 'admin_list_prod' }
+          { text: '➕ បន្ថែមទំនិញថ្មី (Add Product)', callback_data: 'admin_add_prod', style: 'success' },
+          { text: '📦 បញ្ជីទំនិញ (Manage Products)', callback_data: 'admin_list_prod', style: 'primary' }
         ],
         [
-          { text: '📢 ផ្សាយដំណឹង (Broadcast)', callback_data: 'admin_broadcast_prompt' },
-          { text: '📊 ស្ថិតិហាង (Analytics)', callback_data: 'admin_stats' }
+          { text: '📢 ផ្សាយដំណឹង (Broadcast)', callback_data: 'admin_broadcast_prompt', style: 'primary' },
+          { text: '📊 ស្ថិតិហាង (Analytics)', callback_data: 'admin_stats', style: 'primary' }
         ],
         [adminWebBtn]
       ]
@@ -296,21 +279,21 @@ function initBot(webAppUrl) {
       // Send direct notification to User on Telegram
       try {
         const userNotice = `
-🎉 <b>អបអរសាទរ! សំណើ Reseller របស់អ្នកត្រូវបានអនុម័ត! (APPROVED)</b>
+${tgEmoji('party')} <b>អបអរសាទរ! សំណើ Reseller របស់អ្នកត្រូវបានអនុម័ត! (APPROVED)</b>
 ━━━━━━━━━━━━━━━━━━━━━
-🌟 គណនីរបស់អ្នកត្រូវបានដំឡើងជា <b>VIP Reseller</b> ផ្លូវការហើយ!
-💎 ចាប់ពីពេលនេះទៅ អ្នកនឹងទទួលបានតម្លៃពិសេស (Reseller Price) រាល់មុខទំនិញទាំងអស់ក្នុង AstorrIOS Store!
-⚡ រីករាយជាមួយការកុម្ម៉ង់ទំនិញក្នុងតម្លៃទាបបំផុត និងការដឹកជញ្ជូនរហ័ស ២៤/៧!
+${tgEmoji('crown')} គណនីរបស់អ្នកត្រូវបានដំឡើងជា <b>VIP Reseller</b> ផ្លូវការហើយ!
+${tgEmoji('diamond')} ចាប់ពីពេលនេះទៅ អ្នកនឹងទទួលបានតម្លៃពិសេស (Reseller Price) រាល់មុខទំនិញទាំងអស់ក្នុង AstorrIOS Store!
+${tgEmoji('lightning')} រីករាយជាមួយការកុម្ម៉ង់ទំនិញក្នុងតម្លៃទាបបំផុត និងការដឹកជញ្ជូនរហ័ស ២៤/៧!
 
-👇 ចុចប៊ូតុងខាងក្រោមដើម្បីចូលមើលតម្លៃពិសេស Reseller របស់អ្នក៖
+${tgEmoji('down')} ចុចប៊ូតុងខាងក្រោមដើម្បីចូលមើលតម្លៃពិសេស Reseller របស់អ្នក៖
         `;
 
         await bot.sendMessage(targetUserId, userNotice, {
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: '🚀 💎 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 (មើលតម្លៃ Reseller) ✨', web_app: { url: WEBAPP_URL } }],
-              [{ text: '💬 👑 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS' }]
+              [{ text: '🚀 💎 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 (មើលតម្លៃ Reseller) ✨', web_app: { url: WEBAPP_URL }, style: 'success' }],
+              [{ text: '💬 👑 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS', style: 'primary' }]
             ]
           }
         });
@@ -328,7 +311,7 @@ function initBot(webAppUrl) {
       const adminName = query.from.first_name || 'Admin';
 
       const updatedGroupMsg = `
-👑 <b>សំណើសុំធ្វើជា RESELLER — បានបដិសេធ (CANCELLED) ❌</b>
+${tgEmoji('crown')} <b>សំណើសុំធ្វើជា RESELLER — បានបដិសេធ (CANCELLED) ❌</b>
 ━━━━━━━━━━━━━━━━━━━━━
 👤 <b>អតិថិជន៖</b> ${updatedUser.firstName || 'Customer'} ${updatedUser.lastName || ''}
 🆔 <b>Telegram ID៖</b> <code>${targetUserId}</code>
@@ -353,10 +336,10 @@ function initBot(webAppUrl) {
       // Send direct notification to User on Telegram
       try {
         const userNotice = `
-⚠️ <b>សេចក្តីជូនដំណឹងអំពីសំណើសុំធ្វើជា Reseller</b>
+${tgEmoji('alert')} <b>សេចក្តីជូនដំណឹងអំពីសំណើសុំធ្វើជា Reseller</b>
 ━━━━━━━━━━━━━━━━━━━━━
 សួស្តី! Admin បាន Cancel/បដិសេធសំណើសុំធ្វើជា Reseller របស់អ្នកក្នុងពេលនេះ។
-💬 ប្រសិនបើអ្នកមានចម្ងល់ ឬចង់សាកសួរលក្ខខណ្ឌបន្ថែម សូមទាក់ទង Admin ដោយផ្ទាល់៖
+${tgEmoji('support')} ប្រសិនបើអ្នកមានចម្ងល់ ឬចង់សាកសួរលក្ខខណ្ឌបន្ថែម សូមទាក់ទង Admin ដោយផ្ទាល់៖
 👉 <b>Admin Contact៖</b> @AstorrIOS
         `;
 
@@ -364,8 +347,8 @@ function initBot(webAppUrl) {
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: '💬 👑 ទាក់ទង Admin (@AstorrIOS)', url: 'https://t.me/AstorrIOS' }],
-              [{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: WEBAPP_URL } }]
+              [{ text: '💬 👑 ទាក់ទង Admin (@AstorrIOS)', url: 'https://t.me/AstorrIOS', style: 'primary' }],
+              [{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: WEBAPP_URL }, style: 'success' }]
             ]
           }
         });
@@ -383,13 +366,13 @@ function initBot(webAppUrl) {
 
     if (data === 'view_reseller_info') {
       const resellerMsg = `╔════════════════════════════════════════╗
-  👑 <b>កម្មវិធី VIP RESELLER — AstorrIOS</b> 👑
+  ${tgEmoji('crown')} <b>កម្មវិធី VIP RESELLER — AstorrIOS</b> ${tgEmoji('crown')}
 ╚════════════════════════════════════════╝
 
-🌟 <b>អត្ថប្រយោជន៍ពិសេសសម្រាប់សមាជិក Reseller៖</b>
-• 💰 <b>តម្លៃបោះដុំពិសេស៖</b> ទទួលបានការបញ្ចុះតម្លៃពិសេស (Reseller Price) លើគ្រប់មុខទំនិញ
-• ⚡ <b>ស្វ័យប្រវត្តិ ២៤/៧៖</b> ទទួលបាន License Key និងសេវាកម្មភ្លាមៗ
-• 📈 <b>បង្កើនប្រាក់ចំណេញ៖</b> ងាយស្រួលលក់បន្ត និងគ្រប់គ្រងសមតុល្យ
+${tgEmoji('sparkle')} <b>អត្ថប្រយោជន៍ពិសេសសម្រាប់សមាជិក Reseller៖</b>
+• ${tgEmoji('money')} <b>តម្លៃបោះដុំពិសេស៖</b> ទទួលបានការបញ្ចុះតម្លៃពិសេស (Reseller Price) លើគ្រប់មុខទំនិញ
+• ${tgEmoji('lightning')} <b>ស្វ័យប្រវត្តិ ២៤/៧៖</b> ទទួលបាន License Key និងសេវាកម្មភ្លាមៗ
+• ${tgEmoji('chart')} <b>បង្កើនប្រាក់ចំណេញ៖</b> ងាយស្រួលលក់បន្ត និងគ្រប់គ្រងសមតុល្យ
 
 👉 <i>ចុចប៊ូតុងខាងក្រោមដើម្បីចូលហាង និងស្នើសុំសិទ្ធិជា Reseller ដោយឥតគិតថ្លៃ!</i>`;
       bot.sendMessage(chatId, resellerMsg, {
@@ -397,7 +380,7 @@ function initBot(webAppUrl) {
         reply_markup: {
           inline_keyboard: [
             [{ text: '🚀 ចូលហាងដើម្បីស្នើសុំ Reseller', web_app: { url: WEBAPP_URL }, style: 'success' }],
-            [{ text: '🔙 ត្រឡប់ក្រោយ (Main Menu)', callback_data: 'back_to_main' }]
+            [{ text: '🔙 ត្រឡប់ក្រោយ (Main Menu)', callback_data: 'back_to_main', style: 'primary' }]
           ]
         }
       });
@@ -506,16 +489,16 @@ KEY-ASTORR-9999</i>
     if (data === 'admin_stats') {
       const stats = db.getStats();
       bot.sendMessage(chatId, `
-📊 <b>ស្ថិតិហាង AstorrIOS STORE</b>
+${tgEmoji('chart')} <b>ស្ថិតិហាង AstorrIOS STORE</b>
 ━━━━━━━━━━━━━━━━━━━━━
-👥 សមាជិកសរុប៖ <b>${stats.totalUsers}</b>
-📦 មុខទំនិញ៖ <b>${stats.totalProducts}</b>
-🛒 ការទិញបានសម្រេច៖ <b>${stats.paidOrders} / ${stats.totalOrders}</b>
-💰 ចំណូលសរុប៖ <b>$${stats.totalRevenue.toFixed(2)} USD</b>
+${tgEmoji('users')} សមាជិកសរុប៖ <b>${stats.totalUsers}</b>
+${tgEmoji('box')} មុខទំនិញ៖ <b>${stats.totalProducts}</b>
+${tgEmoji('verified')} ការទិញបានសម្រេច៖ <b>${stats.paidOrders} / ${stats.totalOrders}</b>
+${tgEmoji('money')} ចំណូលសរុប៖ <b>$${stats.totalRevenue.toFixed(2)} USD</b>
       `, {
         parse_mode: 'HTML',
         reply_markup: {
-          inline_keyboard: [[{ text: '🔙 ត្រឡប់ក្រោយ (Back)', callback_data: 'admin_panel' }]]
+          inline_keyboard: [[{ text: '🔙 ត្រឡប់ក្រោយ (Back)', callback_data: 'admin_panel', style: 'primary' }]]
         }
       });
       return bot.answerCallbackQuery(query.id);
