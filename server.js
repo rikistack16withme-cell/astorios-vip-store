@@ -4,7 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const db = require('./data/db');
-const { tgEmoji } = require('./config/emojis');
+const { tgEmoji, makeBtn } = require('./config/emojis');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -163,8 +163,8 @@ ${tgEmoji('support')} បើមានបញ្ហា សូមទាក់ទង
 សូមអរគុណសម្រាប់ការគាំទ្រ <b>AstorrIOS</b>! ${tgEmoji('lightning')}
         `;
         const replyButtons = [
-          [{ text: '👥 ចូលរួមគ្រុប VIP', url: result.groupLink, style: 'success' }],
-          [{ text: '💬 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS', style: 'primary' }]
+          [makeBtn('ចូលរួមគ្រុប VIP', { url: result.groupLink }, 'success', 'users')],
+          [makeBtn('ទាក់ទង Admin', { url: 'https://t.me/AstorrIOS' }, 'primary', 'support')]
         ];
 
         telegramBot.sendMessage(telegramId, deliveryMessage, {
@@ -492,8 +492,8 @@ ${tgEmoji('money')} <b>សមតុល្យបច្ចុប្បន្ន៖
 ${tgEmoji('sparkle')} ទឹកប្រាក់ត្រូវបានបញ្ចូលទៅក្នុងគណនីរបស់អ្នករួចរាល់ហើយ! អ្នកអាចប្រើប្រាស់ដើម្បីទិញទំនិញ VIP បានភ្លាមៗ។
               `;
               replyButtons = [
-                [{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' }, style: 'success' }],
-                [{ text: '💬 👑 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS', style: 'primary' }]
+                [makeBtn('OPEN STORE', { web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' } }, 'success', 'game')],
+                [makeBtn('ទាក់ទង Admin', { url: 'https://t.me/AstorrIOS' }, 'primary', 'support')]
               ];
             }
 
@@ -626,8 +626,8 @@ app.post('/api/request-reseller', async (req, res) => {
       const keyboard = {
         inline_keyboard: [
           [
-            { text: '✅ អនុម័ត (Accept)', callback_data: `reseller_accept_${telegramId}`, style: 'success' },
-            { text: '❌ Cancel Request', callback_data: `reseller_reject_${telegramId}`, style: 'danger' }
+            makeBtn('អនុម័ត (Accept)', { callback_data: `reseller_accept_${telegramId}` }, 'success', 'verified'),
+            makeBtn('Cancel Request', { callback_data: `reseller_reject_${telegramId}` }, 'danger')
           ]
         ]
       };
@@ -662,35 +662,53 @@ function checkAdmin(req, res, next) {
   return res.status(403).json({ success: false, error: 'Unauthorized: Admin access only' });
 }
 
-// Upload Image (Base64 from Phone Gallery or PC Folder)
-app.post('/api/upload-image', checkAdmin, (req, res) => {
+// Upload Media (Image, Audio, Voice - Base64 from Phone Gallery, PC, or Microphone)
+app.post(['/api/upload-image', '/api/upload-media', '/api/upload-audio'], checkAdmin, (req, res) => {
   try {
-    const { imageBase64, filename } = req.body;
-    if (!imageBase64) {
-      return res.status(400).json({ success: false, error: 'No image data provided' });
+    const { imageBase64, audioBase64, mediaBase64, fileType } = req.body;
+    const rawData = mediaBase64 || audioBase64 || imageBase64;
+    if (!rawData) {
+      return res.status(400).json({ success: false, error: 'No media data provided' });
     }
 
-    const matches = imageBase64.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
     let ext = 'jpg';
     let dataBuffer;
+    let type = 'image';
 
-    if (matches && matches.length === 3) {
-      ext = matches[1].replace('jpeg', 'jpg');
-      dataBuffer = Buffer.from(matches[2], 'base64');
+    const imageMatch = rawData.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
+    const audioMatch = rawData.match(/^data:audio\/([a-zA-Z0-9+._-]+);base64,(.+)$/);
+
+    if (audioMatch) {
+      type = 'audio';
+      const rawExt = audioMatch[1].toLowerCase();
+      if (rawExt.includes('ogg') || rawExt.includes('opus')) ext = 'ogg';
+      else if (rawExt.includes('mp3') || rawExt.includes('mpeg')) ext = 'mp3';
+      else if (rawExt.includes('wav')) ext = 'wav';
+      else if (rawExt.includes('m4a') || rawExt.includes('mp4')) ext = 'm4a';
+      else ext = 'ogg';
+      dataBuffer = Buffer.from(audioMatch[2], 'base64');
+    } else if (imageMatch) {
+      type = 'image';
+      ext = imageMatch[1].replace('jpeg', 'jpg');
+      dataBuffer = Buffer.from(imageMatch[2], 'base64');
     } else {
-      dataBuffer = Buffer.from(imageBase64, 'base64');
+      dataBuffer = Buffer.from(rawData, 'base64');
+      if (fileType === 'audio' || fileType === 'voice') {
+        type = 'audio';
+        ext = 'ogg';
+      }
     }
 
-    const safeName = `astorr_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${ext}`;
+    const safeName = `astorr_${type}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${ext}`;
     const savePath = path.join(UPLOADS_DIR, safeName);
 
     fs.writeFileSync(savePath, dataBuffer);
 
     const publicUrl = `/uploads/${safeName}`;
-    console.log(`[Upload] Image saved: ${publicUrl}`);
-    res.json({ success: true, url: publicUrl });
+    console.log(`[Upload] Media (${type}) saved: ${publicUrl}`);
+    res.json({ success: true, url: publicUrl, type, ext });
   } catch (err) {
-    console.error('Image upload error:', err);
+    console.error('Media upload error:', err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
@@ -834,43 +852,124 @@ app.post('/api/admin/products/:id/tier-keys', checkAdmin, (req, res) => {
   }
 });
 
-// Admin Broadcast to All Users
+// Admin Broadcast to All Users (Supports Text, Photo, Voice, Audio with Throttling & Anti-Block)
 app.post('/api/admin/broadcast', checkAdmin, async (req, res) => {
   try {
-    const { message, photoUrl } = req.body;
-    if (!message) return res.status(400).json({ success: false, error: 'Message cannot be empty' });
+    const { message, photoUrl, audioUrl, voiceUrl, mediaType } = req.body;
+    if (!message && !photoUrl && !audioUrl && !voiceUrl) {
+      return res.status(400).json({ success: false, error: 'Broadcast content cannot be empty' });
+    }
+
+    if (!telegramBot) {
+      return res.status(500).json({ success: false, error: 'Telegram Bot is not initialized' });
+    }
 
     const allUsers = db.getAllUsers();
     let sentCount = 0;
+    let blockedCount = 0;
     let failedCount = 0;
 
-    if (telegramBot) {
-      for (const user of allUsers) {
+    const webAppUrl = process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz';
+    const broadcastMarkup = {
+      inline_keyboard: [
+        [makeBtn('OPEN STORE', { web_app: { url: webAppUrl } }, 'success', 'game')]
+      ]
+    };
+
+    // Resolve local upload file paths if provided
+    function resolveMediaTarget(url) {
+      if (!url) return null;
+      if (url.startsWith('/uploads/')) {
+        const localPath = path.join(__dirname, 'public', url);
+        if (fs.existsSync(localPath)) return localPath;
+      }
+      return url;
+    }
+
+    const targetPhoto = resolveMediaTarget(photoUrl);
+    const targetVoice = resolveMediaTarget(voiceUrl || (mediaType === 'voice' ? audioUrl : null));
+    const targetAudio = resolveMediaTarget(audioUrl && mediaType !== 'voice' ? audioUrl : null);
+
+    const caption = message || '';
+
+    for (let i = 0; i < allUsers.length; i++) {
+      const user = allUsers[i];
+      if (!user || !user.id) continue;
+
+      let attempts = 0;
+      let success = false;
+
+      while (attempts < 3 && !success) {
+        attempts++;
         try {
-          if (photoUrl) {
-            await telegramBot.sendPhoto(user.id, photoUrl, {
-              caption: message,
-              parse_mode: 'HTML'
+          if (targetVoice) {
+            await telegramBot.sendVoice(user.id, targetVoice, {
+              caption: caption ? `📢 <b>AstorrIOS STORE</b>\n━━━━━━━━━━━━━━━━━━━━━\n${caption}` : undefined,
+              parse_mode: 'HTML',
+              reply_markup: broadcastMarkup
+            });
+          } else if (targetAudio) {
+            await telegramBot.sendAudio(user.id, targetAudio, {
+              caption: caption ? `📢 <b>AstorrIOS STORE</b>\n━━━━━━━━━━━━━━━━━━━━━\n${caption}` : undefined,
+              parse_mode: 'HTML',
+              reply_markup: broadcastMarkup
+            });
+          } else if (targetPhoto) {
+            await telegramBot.sendPhoto(user.id, targetPhoto, {
+              caption: caption ? `📢 <b>AstorrIOS STORE</b>\n━━━━━━━━━━━━━━━━━━━━━\n${caption}` : undefined,
+              parse_mode: 'HTML',
+              reply_markup: broadcastMarkup
             });
           } else {
-            await telegramBot.sendMessage(user.id, message, {
-              parse_mode: 'HTML'
+            await telegramBot.sendMessage(user.id, `📢 <b>AstorrIOS STORE — សេចក្តីជូនដំណឹង</b>\n━━━━━━━━━━━━━━━━━━━━━\n${caption}`, {
+              parse_mode: 'HTML',
+              reply_markup: broadcastMarkup
             });
           }
           sentCount++;
-        } catch (e) {
-          failedCount++;
+          success = true;
+        } catch (err) {
+          const errMsg = String(err?.message || err);
+
+          // 1. User blocked bot or account deactivated: count as blocked, do NOT halt or retry
+          if (errMsg.includes('blocked') || errMsg.includes('deactivated') || errMsg.includes('chat not found') || err?.response?.statusCode === 403) {
+            blockedCount++;
+            success = true; // Mark as processed so loop continues
+            break;
+          }
+
+          // 2. Telegram Rate Limit (429 FLOOD_WAIT): wait required time and retry
+          if (errMsg.includes('429') || errMsg.includes('retry after') || err?.response?.statusCode === 429) {
+            const match = errMsg.match(/retry after (\d+)/i);
+            const waitSec = match ? parseInt(match[1], 10) : (err?.response?.body?.parameters?.retry_after || 3);
+            console.warn(`[API Broadcast] Rate limit 429. Waiting ${waitSec}s before retrying user ${user.id}...`);
+            await new Promise(r => setTimeout(r, (waitSec + 1) * 1000));
+            continue;
+          }
+
+          // 3. Other temporary error: brief backoff and retry
+          if (attempts < 3) {
+            await new Promise(r => setTimeout(r, 600));
+          } else {
+            failedCount++;
+            console.error(`[API Broadcast] Error sending to user ${user.id}:`, errMsg);
+          }
         }
       }
+
+      // Safe pause between users (~25 msgs/sec)
+      await new Promise(r => setTimeout(r, 40));
     }
 
     res.json({
       success: true,
       totalUsers: allUsers.length,
       sentCount,
+      blockedCount,
       failedCount
     });
   } catch (err) {
+    console.error('API Broadcast error:', err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
@@ -917,8 +1016,8 @@ ${tgEmoji('support')} ប្រសិនបើមានចម្ងល់ សូ
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: '💬 👑 ទាក់ទង Admin (@AstorrIOS)', url: 'https://t.me/AstorrIOS', style: 'primary' }],
-              [{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' }, style: 'success' }]
+              [makeBtn('ទាក់ទង Admin (@AstorrIOS)', { url: 'https://t.me/AstorrIOS' }, 'primary', 'support')],
+              [makeBtn('OPEN STORE', { web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' } }, 'success', 'game')]
             ]
           }
         }).catch(err => console.error('Revoke notice TG error:', err.message));
@@ -952,8 +1051,8 @@ ${tgEmoji('lightning')} រីករាយជាមួយការកុម្�
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: '🚀 💎 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 (មើលតម្លៃ Reseller) ✨', web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' }, style: 'success' }],
-              [{ text: '💬 👑 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS', style: 'primary' }]
+              [makeBtn('OPEN STORE (មើលតម្លៃ Reseller)', { web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' } }, 'success', 'diamond')],
+              [makeBtn('ទាក់ទង Admin (@AstorrIOS)', { url: 'https://t.me/AstorrIOS' }, 'primary', 'support')]
             ]
           }
         }).catch(err => console.error('Approve notice TG error:', err.message));
@@ -987,8 +1086,8 @@ ${tgEmoji('support')} ប្រសិនបើអ្នកមានចម្ង�
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: '💬 👑 ទាក់ទង Admin (@AstorrIOS)', url: 'https://t.me/AstorrIOS', style: 'primary' }],
-              [{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' }, style: 'success' }]
+              [makeBtn('ទាក់ទង Admin (@AstorrIOS)', { url: 'https://t.me/AstorrIOS' }, 'primary', 'support')],
+              [makeBtn('OPEN STORE', { web_app: { url: process.env.WEBAPP_URL || 'https://astorrios.bymebank.xyz' } }, 'success', 'game')]
             ]
           }
         }).catch(err => console.error('Reject notice TG error:', err.message));

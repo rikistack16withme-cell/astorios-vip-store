@@ -1443,6 +1443,121 @@ function removeTierProductImageUpload() {
   if (previewImg) previewImg.src = '';
 }
 
+let mediaRecorderInstance = null;
+let voiceRecordInterval = null;
+let recordedVoiceChunks = [];
+
+async function toggleVoiceRecording() {
+  const btn = document.getElementById('recordVoiceBtn');
+  const dot = document.getElementById('recordVoiceDot');
+  const text = document.getElementById('recordVoiceText');
+
+  if (mediaRecorderInstance && mediaRecorderInstance.state === 'recording') {
+    // Stop recording
+    mediaRecorderInstance.stop();
+    if (voiceRecordInterval) clearInterval(voiceRecordInterval);
+    if (dot) {
+      dot.classList.remove('animate-ping', 'bg-red-500');
+      dot.classList.add('bg-red-400');
+    }
+    if (text) text.textContent = 'ថតសំឡេង (Record Voice)';
+    return;
+  }
+
+  // Start recording
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert('Browser របស់អ្នកមិនគាំទ្រការថតសំឡេងទេ');
+    return;
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    let mimeType = '';
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+      mimeType = 'audio/webm;codecs=opus';
+    } else if (window.MediaRecorder && MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
+      mimeType = 'audio/ogg;codecs=opus';
+    } else if (window.MediaRecorder && MediaRecorder.isTypeSupported('audio/mp4')) {
+      mimeType = 'audio/mp4';
+    }
+
+    mediaRecorderInstance = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+    recordedVoiceChunks = [];
+
+    mediaRecorderInstance.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) recordedVoiceChunks.push(e.data);
+    };
+
+    mediaRecorderInstance.onstop = async () => {
+      stream.getTracks().forEach(track => track.stop());
+      const audioBlob = new Blob(recordedVoiceChunks, { type: mimeType || 'audio/ogg' });
+
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Audio = reader.result;
+
+        const emptyWrap = document.getElementById('broadcastUploadEmpty');
+        const previewWrap = document.getElementById('broadcastPreviewWrap');
+        const previewAudio = document.getElementById('broadcastPreviewAudio');
+        const previewImg = document.getElementById('broadcastPreviewImg');
+        const mediaUrlInput = document.getElementById('broadcastMediaUrl');
+        const mediaTypeInput = document.getElementById('broadcastMediaType');
+        const mediaBadge = document.getElementById('broadcastMediaBadge');
+
+        if (emptyWrap) emptyWrap.classList.add('hidden');
+        if (previewWrap) previewWrap.classList.remove('hidden');
+        if (previewImg) previewImg.classList.add('hidden');
+        if (previewAudio) {
+          previewAudio.src = URL.createObjectURL(audioBlob);
+          previewAudio.classList.remove('hidden');
+        }
+        if (mediaTypeInput) mediaTypeInput.value = 'voice';
+        if (mediaBadge) mediaBadge.textContent = '🎤 Voice Note';
+
+        showToast('កំពុង Upload សារសំឡេង...');
+        try {
+          const res = await fetch('/api/upload-media', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-admin-id': state.user.id || '6805487598',
+              'x-admin-auth': 'true'
+            },
+            body: JSON.stringify({ mediaBase64: base64Audio, fileType: 'voice' })
+          });
+          const data = await res.json();
+          if (data.success && data.url) {
+            if (mediaUrlInput) mediaUrlInput.value = data.url;
+            showToast('បាន Upload សារសំឡេងជោគជ័យ!');
+          }
+        } catch (e) {
+          showToast('Error uploading voice');
+        }
+      };
+      reader.readAsDataURL(audioBlob);
+    };
+
+    mediaRecorderInstance.start();
+    let sec = 0;
+    if (dot) {
+      dot.classList.remove('bg-red-400');
+      dot.classList.add('animate-ping', 'bg-red-500');
+    }
+    if (text) text.textContent = 'កំពុងថត (00:00) — ចុចដើម្បីបញ្ឈប់';
+
+    voiceRecordInterval = setInterval(() => {
+      sec++;
+      const m = String(Math.floor(sec / 60)).padStart(2, '0');
+      const s = String(sec % 60).padStart(2, '0');
+      if (text) text.textContent = `កំពុងថត (${m}:${s}) — ចុចដើម្បីបញ្ឈប់`;
+    }, 1000);
+
+  } catch (err) {
+    console.error('Microphone access denied:', err);
+    alert('មិនអាចចូលដំណើរការ Microphone បានទេ (Please allow microphone access)');
+  }
+}
+
 async function handleBroadcastFile(e) {
   const file = e.target.files?.[0];
   if (!file) return;
@@ -1450,38 +1565,92 @@ async function handleBroadcastFile(e) {
   const emptyWrap = document.getElementById('broadcastUploadEmpty');
   const previewWrap = document.getElementById('broadcastPreviewWrap');
   const previewImg = document.getElementById('broadcastPreviewImg');
-  const urlInput = document.getElementById('broadcastPhotoInput');
+  const previewAudio = document.getElementById('broadcastPreviewAudio');
+  const mediaUrlInput = document.getElementById('broadcastMediaUrl');
+  const mediaTypeInput = document.getElementById('broadcastMediaType');
+  const mediaBadge = document.getElementById('broadcastMediaBadge');
 
   try {
     if (emptyWrap) emptyWrap.classList.add('hidden');
     if (previewWrap) previewWrap.classList.remove('hidden');
 
-    const compressedDataUrl = await compressAndConvertImage(file, 1200, 0.85);
-    if (previewImg) previewImg.src = compressedDataUrl;
+    const isImage = file.type.startsWith('image/');
+    const isAudio = file.type.startsWith('audio/') || /\.(mp3|ogg|m4a|wav|aac)$/i.test(file.name);
 
-    const result = await uploadImageToServer(compressedDataUrl, file.name);
-    if (result.success && result.url) {
-      if (urlInput) urlInput.value = result.url;
-      showToast('បាន Upload Banner រួចរាល់!');
-    } else {
-      if (urlInput) urlInput.value = compressedDataUrl;
+    if (isImage) {
+      if (previewAudio) previewAudio.classList.add('hidden');
+      if (previewImg) {
+        previewImg.classList.remove('hidden');
+        const compressed = await compressAndConvertImage(file, 1200, 0.85);
+        previewImg.src = compressed;
+        if (mediaTypeInput) mediaTypeInput.value = 'image';
+        if (mediaBadge) mediaBadge.textContent = '🖼️ Photo Banner';
+
+        const result = await uploadImageToServer(compressed, file.name);
+        if (result.success && result.url) {
+          if (mediaUrlInput) mediaUrlInput.value = result.url;
+          showToast('បាន Upload Banner រួចរាល់!');
+        }
+      }
+    } else if (isAudio) {
+      if (previewImg) previewImg.classList.add('hidden');
+      if (previewAudio) {
+        previewAudio.classList.remove('hidden');
+        previewAudio.src = URL.createObjectURL(file);
+      }
+      if (mediaTypeInput) mediaTypeInput.value = 'voice';
+      if (mediaBadge) mediaBadge.textContent = '🎤 Voice / Audio';
+
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        showToast('កំពុង Upload Audio...');
+        const res = await fetch('/api/upload-media', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-admin-id': state.user.id || '6805487598',
+            'x-admin-auth': 'true'
+          },
+          body: JSON.stringify({ mediaBase64: reader.result, fileType: 'voice', filename: file.name })
+        });
+        const data = await res.json();
+        if (data.success && data.url) {
+          if (mediaUrlInput) mediaUrlInput.value = data.url;
+          showToast('បាន Upload Audio រួចរាល់!');
+        }
+      };
+      reader.readAsDataURL(file);
     }
   } catch (err) {
-    showToast('Failed to upload banner');
+    showToast('Failed to upload media');
   }
 }
 
 function removeBroadcastUpload() {
   const fileInput = document.getElementById('broadcastFileInput');
   if (fileInput) fileInput.value = '';
-  const urlInput = document.getElementById('broadcastPhotoInput');
-  if (urlInput) urlInput.value = '';
+  const mediaUrlInput = document.getElementById('broadcastMediaUrl');
+  if (mediaUrlInput) mediaUrlInput.value = '';
+  const mediaTypeInput = document.getElementById('broadcastMediaType');
+  if (mediaTypeInput) mediaTypeInput.value = '';
+
   const emptyWrap = document.getElementById('broadcastUploadEmpty');
   if (emptyWrap) emptyWrap.classList.remove('hidden');
+
   const previewWrap = document.getElementById('broadcastPreviewWrap');
   if (previewWrap) previewWrap.classList.add('hidden');
+
   const previewImg = document.getElementById('broadcastPreviewImg');
-  if (previewImg) previewImg.src = '';
+  if (previewImg) {
+    previewImg.src = '';
+    previewImg.classList.add('hidden');
+  }
+
+  const previewAudio = document.getElementById('broadcastPreviewAudio');
+  if (previewAudio) {
+    previewAudio.src = '';
+    previewAudio.classList.add('hidden');
+  }
 }
 
 // -------------------------------------------------------------
@@ -2185,13 +2354,31 @@ async function deleteCategoryConfirm(catName) {
 // -------------------------------------------------------------
 async function handleAdminBroadcast(e) {
   e.preventDefault();
-  const text = document.getElementById('broadcastTextInput').value;
-  const photoUrl = document.getElementById('broadcastPhotoInput').value;
+  const text = (document.getElementById('broadcastTextInput')?.value || '').trim();
+  const mediaUrl = document.getElementById('broadcastMediaUrl')?.value || '';
+  const mediaType = document.getElementById('broadcastMediaType')?.value || '';
   const statusElem = document.getElementById('broadcastStatus');
+  const submitBtn = document.getElementById('broadcastSubmitBtn');
 
-  statusElem.innerHTML = '<span class="text-yellow-400">កំពុងផ្សាយដំណឹង...</span>';
+  if (!text && !mediaUrl) {
+    alert('សូមវាយបញ្ចូលសារផ្សាយដំណឹង ឬជ្រើសរើស រូបភាព/សារសំឡេង!');
+    return;
+  }
+
+  if (submitBtn) submitBtn.disabled = true;
+  if (statusElem) {
+    statusElem.innerHTML = '<span class="text-yellow-400 font-semibold animate-pulse">⏳ កំពុងផ្សាយដំណឹងទៅកាន់អ្នកប្រើប្រាស់ទាំងអស់ (ដំណើរការជាមួយ Throttling & Anti-Block)...</span>';
+  }
 
   try {
+    const payload = {
+      message: text,
+      photoUrl: mediaType === 'image' ? mediaUrl : null,
+      voiceUrl: mediaType === 'voice' ? mediaUrl : null,
+      audioUrl: mediaType === 'audio' ? mediaUrl : null,
+      mediaType
+    };
+
     const res = await fetch('/api/admin/broadcast', {
       method: 'POST',
       headers: {
@@ -2199,18 +2386,39 @@ async function handleAdminBroadcast(e) {
         'x-admin-id': state.user.id || '6805487598',
         'x-admin-auth': 'true'
       },
-      body: JSON.stringify({ message: text, photoUrl })
+      body: JSON.stringify(payload)
     });
 
     const data = await res.json();
     if (data.success) {
-      statusElem.innerHTML = `<span class="text-emerald-400 font-bold">បានផ្ញើជោគជ័យ៖ ${data.sentCount} នាក់ (បរាជ័យ: ${data.failedCount})</span>`;
+      if (statusElem) {
+        statusElem.innerHTML = `
+          <div class="p-3 bg-emerald-950/50 border border-emerald-500/40 rounded-xl space-y-1 mt-2">
+            <div class="text-emerald-400 font-bold text-xs flex items-center gap-1">
+              <span>✅ ការផ្សាយដំណឹងបានបញ្ចប់ជោគជ័យ!</span>
+            </div>
+            <div class="text-gray-300 text-[11px]">👥 អ្នកទទួលសរុប៖ <b>${data.totalUsers}</b> នាក់</div>
+            <div class="text-emerald-300 text-[11px]">✨ បានផ្ញើជោគជ័យ៖ <b>${data.sentCount}</b> នាក់</div>
+            <div class="text-amber-300 text-[11px]">🚫 បាន Block Bot (Blocked)៖ <b>${data.blockedCount || 0}</b> នាក់</div>
+            ${data.failedCount > 0 ? `<div class="text-red-400 text-[11px]">⚠️ បរាជ័យផ្សេងៗ៖ <b>${data.failedCount}</b> នាក់</div>` : ''}
+          </div>
+        `;
+      }
       showToast('បានផ្សាយដំណឹងរួចរាល់!');
+      removeBroadcastUpload();
+      const txtElem = document.getElementById('broadcastTextInput');
+      if (txtElem) txtElem.value = '';
     } else {
-      statusElem.innerHTML = `<span class="text-red-400">${data.error || 'Failed'}</span>`;
+      if (statusElem) {
+        statusElem.innerHTML = `<span class="text-red-400 font-bold">❌ ${data.error || 'Failed'}</span>`;
+      }
     }
   } catch (err) {
-    statusElem.innerHTML = '<span class="text-red-400">Network error</span>';
+    if (statusElem) {
+      statusElem.innerHTML = '<span class="text-red-400 font-bold">❌ Network error</span>';
+    }
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
   }
 }
 

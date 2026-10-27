@@ -65,17 +65,17 @@ function initBot(webAppUrl) {
     const keyboard = [
       [
         isGroup
-          ? { text: '🚀 🎮 OPEN STORE ⚡️ ✨', url: `https://t.me/${process.env.BOT_USERNAME || 'AstorrIOS_bot'}`, style: 'success' }
-          : { text: '🚀 🎮 OPEN STORE ⚡️ ✨', web_app: { url: WEBAPP_URL }, style: 'success' }
+          ? makeBtn('OPEN STORE', { url: `https://t.me/${process.env.BOT_USERNAME || 'AstorrIOS_bot'}` }, 'success', 'game')
+          : makeBtn('OPEN STORE', { web_app: { url: WEBAPP_URL } }, 'success', 'game')
       ],
       [
-        { text: '👑 💬 CONTACT ADMIN 💬 👑', url: 'https://t.me/AstorrIOS', style: 'primary' }
+        makeBtn('CONTACT ADMIN', { url: 'https://t.me/AstorrIOS' }, 'primary', 'support')
       ]
     ];
 
     if (isAdmin(userId)) {
       keyboard.push([
-        { text: '⚙️ ADMIN CONTROL PANEL', callback_data: 'admin_panel', style: 'primary' }
+        makeBtn('ADMIN CONTROL PANEL', { callback_data: 'admin_panel' }, 'primary', 'gear')
       ]);
     }
 
@@ -174,7 +174,7 @@ function initBot(webAppUrl) {
       bot.sendMessage(chatId, `👋 សួស្តី! ចុចទីនេះដើម្បីបើកមើលទំនិញ៖`, {
         reply_markup: {
           inline_keyboard: [
-            [{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: WEBAPP_URL } }]
+            [makeBtn('OPEN STORE', { web_app: { url: WEBAPP_URL } }, 'success', 'game')]
           ]
         }
       });
@@ -191,7 +191,7 @@ function initBot(webAppUrl) {
     if (!isAdmin(userId)) return;
 
     const textToBroadcast = match[1];
-    executeBroadcast(chatId, textToBroadcast);
+    executeBroadcastText(chatId, textToBroadcast);
   });
 
   // -------------------------------------------------------------
@@ -212,18 +212,18 @@ ${tgEmoji('money')} <b>ចំណូលសរុប (Revenue):</b> $${stats.total
     `;
 
     const adminWebBtn = isGroup
-      ? { text: '🌐 បើក Admin WebApp', url: `https://t.me/${process.env.BOT_USERNAME || 'AstorrIOS_bot'}?start=admin`, style: 'primary' }
-      : { text: '🌐 បើក Admin WebApp', web_app: { url: `${WEBAPP_URL}?admin=true` }, style: 'primary' };
+      ? makeBtn('បើក Admin WebApp', { url: `https://t.me/${process.env.BOT_USERNAME || 'AstorrIOS_bot'}?start=admin` }, 'primary', 'rocket')
+      : makeBtn('បើក Admin WebApp', { web_app: { url: `${WEBAPP_URL}?admin=true` } }, 'primary', 'rocket');
 
     const markup = {
       inline_keyboard: [
         [
-          { text: '➕ បន្ថែមទំនិញថ្មី (Add Product)', callback_data: 'admin_add_prod', style: 'success' },
-          { text: '📦 បញ្ជីទំនិញ (Manage Products)', callback_data: 'admin_list_prod', style: 'primary' }
+          makeBtn('បន្ថែមទំនិញថ្មី (Add Product)', { callback_data: 'admin_add_prod' }, 'success', 'sparkle'),
+          makeBtn('បញ្ជីទំនិញ (Manage Products)', { callback_data: 'admin_list_prod' }, 'primary', 'box')
         ],
         [
-          { text: '📢 ផ្សាយដំណឹង (Broadcast)', callback_data: 'admin_broadcast_prompt', style: 'primary' },
-          { text: '📊 ស្ថិតិហាង (Analytics)', callback_data: 'admin_stats', style: 'primary' }
+          makeBtn('ផ្សាយដំណឹង (Broadcast)', { callback_data: 'admin_broadcast_prompt' }, 'primary', 'bell'),
+          makeBtn('ស្ថិតិហាង (Analytics)', { callback_data: 'admin_stats' }, 'primary', 'chart')
         ],
         [adminWebBtn]
       ]
@@ -292,8 +292,8 @@ ${tgEmoji('down')} ចុចប៊ូតុងខាងក្រោមដើម�
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: '🚀 💎 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 (មើលតម្លៃ Reseller) ✨', web_app: { url: WEBAPP_URL }, style: 'success' }],
-              [{ text: '💬 👑 ទាក់ទង Admin', url: 'https://t.me/AstorrIOS', style: 'primary' }]
+              [makeBtn('OPEN STORE (មើលតម្លៃ Reseller)', { web_app: { url: WEBAPP_URL } }, 'success', 'diamond')],
+              [makeBtn('ទាក់ទង Admin (@AstorrIOS)', { url: 'https://t.me/AstorrIOS' }, 'primary', 'support')]
             ]
           }
         });
@@ -347,8 +347,8 @@ ${tgEmoji('support')} ប្រសិនបើអ្នកមានចម្ង�
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: '💬 👑 ទាក់ទង Admin (@AstorrIOS)', url: 'https://t.me/AstorrIOS', style: 'primary' }],
-              [{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: WEBAPP_URL }, style: 'success' }]
+              [makeBtn('ទាក់ទង Admin (@AstorrIOS)', { url: 'https://t.me/AstorrIOS' }, 'primary', 'support')],
+              [makeBtn('OPEN STORE', { web_app: { url: WEBAPP_URL } }, 'success', 'game')]
             ]
           }
         });
@@ -379,8 +379,8 @@ ${tgEmoji('sparkle')} <b>អត្ថប្រយោជន៍ពិសេសស�
         parse_mode: 'HTML',
         reply_markup: {
           inline_keyboard: [
-            [{ text: '🚀 ចូលហាងដើម្បីស្នើសុំ Reseller', web_app: { url: WEBAPP_URL }, style: 'success' }],
-            [{ text: '🔙 ត្រឡប់ក្រោយ (Main Menu)', callback_data: 'back_to_main', style: 'primary' }]
+            [makeBtn('ចូលហាងដើម្បីស្នើសុំ Reseller', { web_app: { url: WEBAPP_URL } }, 'success', 'crown')],
+            [makeBtn('ត្រឡប់ក្រោយ (Main Menu)', { callback_data: 'back_to_main' }, 'primary', 'pointer')]
           ]
         }
       });
@@ -389,10 +389,9 @@ ${tgEmoji('sparkle')} <b>អត្ថប្រយោជន៍ពិសេសស�
 
     if (data === 'back_to_main') {
       const isGroup = query.message.chat.type === 'group' || query.message.chat.type === 'supergroup';
-      const firstName = query.from.first_name || '';
-      bot.sendMessage(chatId, getMainMenuCaption(firstName), {
+      bot.sendMessage(chatId, getAnimatedCaption(), {
         parse_mode: 'HTML',
-        reply_markup: getMainMenuKeyboard(isGroup, userId)
+        reply_markup: getStartKeyboard(isGroup, userId)
       });
       return bot.answerCallbackQuery(query.id);
     }
@@ -428,12 +427,12 @@ ${tgEmoji('sparkle')} <b>អត្ថប្រយោជន៍ពិសេសស�
         const stock = Array.isArray(p.keys) ? p.keys.length : 0;
         text += `${index + 1}. <b>${p.name}</b>\n   💵 តម្លៃ: $${p.price.toFixed(2)} | ស្តុក: ${stock} keys\n\n`;
         buttons.push([
-          { text: `🔑 ថែម Key: ${p.name.substring(0, 18)}...`, callback_data: `admin_add_keys_${p.id}` },
-          { text: `❌ លុប`, callback_data: `admin_del_prod_${p.id}` }
+          makeBtn(`ថែម Key: ${p.name.substring(0, 18)}...`, { callback_data: `admin_add_keys_${p.id}` }, 'primary', 'key'),
+          makeBtn(`លុប`, { callback_data: `admin_del_prod_${p.id}` }, 'danger')
         ]);
       });
 
-      buttons.push([{ text: '🔙 ត្រឡប់ក្រោយ (Back)', callback_data: 'admin_panel' }]);
+      buttons.push([makeBtn('ត្រឡប់ក្រោយ (Back)', { callback_data: 'admin_panel' }, 'primary', 'pointer')]);
 
       bot.sendMessage(chatId, text, {
         parse_mode: 'HTML',
@@ -478,8 +477,13 @@ KEY-ASTORR-9999</i>
       bot.sendMessage(chatId, `
 📢 <b>ផ្សាយដំណឹង (Broadcast Announcement)</b>
 ━━━━━━━━━━━━━━━━━━━━━
-សូមផ្ញើសារ ឬរូបភាពដែលចង់ផ្សាយទៅកាន់អ្នកប្រើប្រាស់ទាំងអស់ដែលបានចុច Start ក្នុង Bot៖
-<i>(អាចប្រើប្រាស់អក្សរ HTML/Markdown បាន)</i>
+សូមផ្ញើសារដែលអ្នកចង់ផ្សាយទៅកាន់អ្នកប្រើប្រាស់ទាំងអស់៖
+• <b>សារអក្សរ (Text)</b>
+• <b>រូបភាព (Photo)</b>
+• <b>សារសំឡេង (Voice Note 🎤)</b>
+• <b>ឯកសារសំឡេង (Audio File 🎧)</b>
+
+<i>(អាចភ្ជាប់ Caption អក្សរ HTML/Markdown ជាមួយរូបភាព ឬសារសំឡេងបាន)</i>
 
 (ចុច /cancel ដើម្បីបោះបង់)
       `, { parse_mode: 'HTML' });
@@ -498,7 +502,7 @@ ${tgEmoji('money')} ចំណូលសរុប៖ <b>$${stats.totalRevenue.toFi
       `, {
         parse_mode: 'HTML',
         reply_markup: {
-          inline_keyboard: [[{ text: '🔙 ត្រឡប់ក្រោយ (Back)', callback_data: 'admin_panel', style: 'primary' }]]
+          inline_keyboard: [[makeBtn('ត្រឡប់ក្រោយ (Back)', { callback_data: 'admin_panel' }, 'primary', 'pointer')]]
         }
       });
       return bot.answerCallbackQuery(query.id);
@@ -510,10 +514,20 @@ ${tgEmoji('money')} ចំណូលសរុប៖ <b>$${stats.totalRevenue.toFi
   // -------------------------------------------------------------
   bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
-    const userId = msg.from.id;
+    const userId = msg.from?.id;
     const text = msg.text;
 
-    if (!text && !msg.photo) return;
+    // Track user in database whenever they interact with the bot in private chat
+    if (userId && msg.chat.type === 'private') {
+      db.saveUser({
+        id: userId,
+        username: msg.from.username || '',
+        firstName: msg.from.first_name || '',
+        lastName: msg.from.last_name || ''
+      });
+    }
+
+    if (!text && !msg.photo && !msg.voice && !msg.audio) return;
     if (text === '/cancel') {
       if (adminSessions[userId]) {
         delete adminSessions[userId];
@@ -527,12 +541,16 @@ ${tgEmoji('money')} ចំណូលសរុប៖ <b>$${stats.totalRevenue.toFi
     // Broadcast session
     if (session.action === 'broadcast') {
       delete adminSessions[userId];
-      if (msg.photo && msg.photo.length > 0) {
+      if (msg.voice) {
+        executeBroadcastVoice(chatId, msg.voice.file_id, msg.caption);
+      } else if (msg.audio) {
+        executeBroadcastAudio(chatId, msg.audio.file_id, msg.caption);
+      } else if (msg.photo && msg.photo.length > 0) {
         const photoId = msg.photo[msg.photo.length - 1].file_id;
         const caption = msg.caption || '';
         executeBroadcastPhoto(chatId, photoId, caption);
-      } else {
-        executeBroadcast(chatId, text);
+      } else if (text) {
+        executeBroadcastText(chatId, text);
       }
       return;
     }
@@ -674,10 +692,10 @@ ${tgEmoji('money')} ចំណូលសរុប៖ <b>$${stats.totalRevenue.toFi
             inline_keyboard: [
               [
                 chatId < 0
-                  ? { text: '🎮 បើកមើលក្នុង STORE', url: `https://t.me/${process.env.BOT_USERNAME || 'AstorrIOS_bot'}` }
-                  : { text: '🎮 បើកមើលក្នុង STORE', web_app: { url: WEBAPP_URL } }
+                  ? makeBtn('បើកមើលក្នុង STORE', { url: `https://t.me/${process.env.BOT_USERNAME || 'AstorrIOS_bot'}` }, 'success', 'game')
+                  : makeBtn('បើកមើលក្នុង STORE', { web_app: { url: WEBAPP_URL } }, 'success', 'game')
               ],
-              [{ text: '👑 ត្រឡប់ទៅ Admin Panel', callback_data: 'admin_panel' }]
+              [makeBtn('ត្រឡប់ទៅ Admin Panel', { callback_data: 'admin_panel' }, 'primary', 'gear')]
             ]
           }
         });
@@ -686,65 +704,157 @@ ${tgEmoji('money')} ចំណូលសរុប៖ <b>$${stats.totalRevenue.toFi
   });
 
   // -------------------------------------------------------------
-  // Helper: Broadcast Functions
+  // Resilient Multi-User Broadcast Helper
+  // Handles 40ms throttling, 429 flood wait retries, and 403 blocked users
   // -------------------------------------------------------------
-  async function executeBroadcast(adminChatId, broadcastMessage) {
+  async function broadcastToAllUsers(adminChatId, sendUserFn, mediaTitle = 'សារ') {
     const allUsers = db.getAllUsers();
-    bot.sendMessage(adminChatId, `⏳ កំពុងផ្សាយដំណឹងទៅកាន់អ្នកប្រើប្រាស់ចំនួន ${allUsers.length} នាក់...`);
+    await bot.sendMessage(adminChatId, `⏳ <b>កំពុងចាប់ផ្តើមផ្សាយ${mediaTitle}ទៅកាន់អ្នកប្រើប្រាស់ ${allUsers.length} នាក់...</b>\n<i>(ដំណើរការជាមួយ Throttling & Anti-Block Rate Limiter)</i>`, { parse_mode: 'HTML' });
 
     let sent = 0;
+    let blocked = 0;
     let failed = 0;
 
-    for (const u of allUsers) {
-      try {
-        await bot.sendMessage(u.id, `📢 <b>AstorrIOS STORE — សេចក្តីជូនដំណឹង</b>\n━━━━━━━━━━━━━━━━━━━━━\n${broadcastMessage}`, {
-          parse_mode: 'HTML',
-          reply_markup: {
-            inline_keyboard: [[{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: WEBAPP_URL } }]]
+    for (let i = 0; i < allUsers.length; i++) {
+      const u = allUsers[i];
+      if (!u || !u.id) continue;
+
+      let attempts = 0;
+      let success = false;
+
+      while (attempts < 3 && !success) {
+        attempts++;
+        try {
+          await sendUserFn(u.id);
+          sent++;
+          success = true;
+        } catch (err) {
+          const errMsg = String(err?.message || err);
+
+          // 1. User blocked the bot or account deactivated: count as blocked, do NOT halt or retry
+          if (errMsg.includes('blocked') || errMsg.includes('deactivated') || errMsg.includes('chat not found') || err?.response?.statusCode === 403) {
+            blocked++;
+            success = true; // Mark done for this user and continue
+            break;
           }
-        });
-        sent++;
-      } catch (e) {
-        failed++;
+
+          // 2. Telegram Rate Limit (429 FLOOD_WAIT): wait required time and retry
+          if (errMsg.includes('429') || errMsg.includes('retry after') || err?.response?.statusCode === 429) {
+            const match = errMsg.match(/retry after (\d+)/i);
+            const waitSec = match ? parseInt(match[1], 10) : (err?.response?.body?.parameters?.retry_after || 3);
+            console.warn(`[Broadcast] Rate limit 429 hit. Waiting ${waitSec}s before retrying user ${u.id}...`);
+            await new Promise(r => setTimeout(r, (waitSec + 1) * 1000));
+            continue;
+          }
+
+          // 3. Other network error: backoff briefly and retry
+          if (attempts < 3) {
+            await new Promise(r => setTimeout(r, 600));
+          } else {
+            failed++;
+            console.error(`[Broadcast] Error sending to user ${u.id}:`, errMsg);
+          }
+        }
       }
+
+      // Safe pause between users (~25 messages/sec)
+      await new Promise(r => setTimeout(r, 40));
     }
 
-    bot.sendMessage(adminChatId, `
-✅ <b>ការផ្សាយដំណឹងបានបញ្ចប់! (Broadcast Completed)</b>
+    const summaryMsg = `
+${tgEmoji('verified')} <b>ការផ្សាយដំណឹងបានបញ្ចប់ជោគជ័យ!</b>
 ━━━━━━━━━━━━━━━━━━━━━
-📤 បានផ្ញើជោគជ័យ៖ <b>${sent}</b> នាក់
-⚠️ មិនជោគជ័យ (Blocked/Error)៖ <b>${failed}</b> នាក់
-    `, { parse_mode: 'HTML' });
+${tgEmoji('users')} <b>អ្នកទទួលសរុប (Total Users):</b> ${allUsers.length} នាក់
+${tgEmoji('sparkle')} <b>បានផ្ញើជោគជ័យ (Sent):</b> ${sent} នាក់
+${tgEmoji('alert')} <b>បាន Block Bot (Blocked):</b> ${blocked} នាក់
+${tgEmoji('chart')} <b>បរាជ័យផ្សេងៗ (Failed):</b> ${failed} នាក់
+━━━━━━━━━━━━━━━━━━━━━
+⚡ <i>AstorrIOS STORE — High Performance Broadcast Engine</i>
+    `;
+
+    await bot.sendMessage(adminChatId, summaryMsg, {
+      parse_mode: 'HTML',
+      reply_markup: {
+        inline_keyboard: [
+          [makeBtn('ADMIN CONTROL PANEL', { callback_data: 'admin_panel' }, 'primary', 'gear')]
+        ]
+      }
+    });
+
+    return { total: allUsers.length, sent, blocked, failed };
   }
 
+  // 1. Text Broadcast
+  async function executeBroadcastText(adminChatId, broadcastMessage) {
+    const markup = {
+      inline_keyboard: [
+        [makeBtn('OPEN STORE', { web_app: { url: WEBAPP_URL } }, 'success', 'game')]
+      ]
+    };
+    const caption = `📢 <b>AstorrIOS STORE — សេចក្តីជូនដំណឹង</b>\n━━━━━━━━━━━━━━━━━━━━━\n${broadcastMessage}`;
+    return await broadcastToAllUsers(adminChatId, (userId) => {
+      return bot.sendMessage(userId, caption, {
+        parse_mode: 'HTML',
+        reply_markup: markup
+      });
+    }, 'សារអក្សរ');
+  }
+
+  // 2. Photo Broadcast
   async function executeBroadcastPhoto(adminChatId, photoId, caption) {
-    const allUsers = db.getAllUsers();
-    bot.sendMessage(adminChatId, `⏳ កំពុងផ្សាយដំណឹងជាមួយរូបភាពទៅកាន់ ${allUsers.length} នាក់...`);
+    const markup = {
+      inline_keyboard: [
+        [makeBtn('OPEN STORE', { web_app: { url: WEBAPP_URL } }, 'success', 'game')]
+      ]
+    };
+    const photoCaption = caption
+      ? `📢 <b>AstorrIOS STORE</b>\n━━━━━━━━━━━━━━━━━━━━━\n${caption}`
+      : `📢 <b>AstorrIOS STORE — សេចក្តីជូនដំណឹង</b>`;
+    return await broadcastToAllUsers(adminChatId, (userId) => {
+      return bot.sendPhoto(userId, photoId, {
+        caption: photoCaption,
+        parse_mode: 'HTML',
+        reply_markup: markup
+      });
+    }, 'រូបភាព Banner');
+  }
 
-    let sent = 0;
-    let failed = 0;
+  // 3. Voice Note Broadcast
+  async function executeBroadcastVoice(adminChatId, voiceId, caption) {
+    const markup = {
+      inline_keyboard: [
+        [makeBtn('OPEN STORE', { web_app: { url: WEBAPP_URL } }, 'success', 'game')]
+      ]
+    };
+    const voiceCaption = caption
+      ? `🎤 <b>សារសំឡេងពី AstorrIOS STORE</b>\n━━━━━━━━━━━━━━━━━━━━━\n${caption}`
+      : `🎤 <b>សារសំឡេងពី AstorrIOS STORE</b>`;
+    return await broadcastToAllUsers(adminChatId, (userId) => {
+      return bot.sendVoice(userId, voiceId, {
+        caption: voiceCaption,
+        parse_mode: 'HTML',
+        reply_markup: markup
+      });
+    }, 'សារសំឡេង (Voice Note)');
+  }
 
-    for (const u of allUsers) {
-      try {
-        await bot.sendPhoto(u.id, photoId, {
-          caption: `📢 <b>AstorrIOS STORE</b>\n━━━━━━━━━━━━━━━━━━━━━\n${caption}`,
-          parse_mode: 'HTML',
-          reply_markup: {
-            inline_keyboard: [[{ text: '🚀 🎮 𝐎𝐏𝐄𝐍 𝐒𝐓𝐎𝐑𝐄 ⚡️ ✨', web_app: { url: WEBAPP_URL } }]]
-          }
-        });
-        sent++;
-      } catch (e) {
-        failed++;
-      }
-    }
-
-    bot.sendMessage(adminChatId, `
-✅ <b>ការផ្សាយដំណឹងបានបញ្ចប់! (Broadcast Completed)</b>
-━━━━━━━━━━━━━━━━━━━━━
-📤 បានផ្ញើជោគជ័យ៖ <b>${sent}</b> នាក់
-⚠️ មិនជោគជ័យ៖ <b>${failed}</b> នាក់
-    `, { parse_mode: 'HTML' });
+  // 4. Audio File Broadcast
+  async function executeBroadcastAudio(adminChatId, audioId, caption) {
+    const markup = {
+      inline_keyboard: [
+        [makeBtn('OPEN STORE', { web_app: { url: WEBAPP_URL } }, 'success', 'game')]
+      ]
+    };
+    const audioCaption = caption
+      ? `🎧 <b>ឯកសារសំឡេងពី AstorrIOS STORE</b>\n━━━━━━━━━━━━━━━━━━━━━\n${caption}`
+      : `🎧 <b>ឯកសារសំឡេងពី AstorrIOS STORE</b>`;
+    return await broadcastToAllUsers(adminChatId, (userId) => {
+      return bot.sendAudio(userId, audioId, {
+        caption: audioCaption,
+        parse_mode: 'HTML',
+        reply_markup: markup
+      });
+    }, 'ឯកសារសំឡេង (Audio)');
   }
 
   return bot;

@@ -894,50 +894,60 @@
         <div id="adminTabBroadcast" class="hidden">
           <form onsubmit="handleAdminBroadcast(event)">
             <label class="admin-label">សារផ្សាយដំណឹងទៅកាន់អ្នកប្រើប្រាស់ទាំងអស់ (Broadcast Message)</label>
-            <textarea id="broadcastTextInput" class="admin-textarea text-xs mb-3" rows="5"
-              placeholder="សួស្តីអតិថិជនទាំងអស់! ថ្ងៃនេះ AstorrIOS STORE មានប្រូម៉ូសិន..." required></textarea>
+            <textarea id="broadcastTextInput" class="admin-textarea text-xs mb-3" rows="4"
+              placeholder="វាយបញ្ចូលសារផ្សាយដំណឹង ឬទុកទទេបើចង់ផ្ញើតែសារសំឡេង/រូបភាព..."></textarea>
 
             <div class="admin-input-group mb-4">
               <div class="flex justify-between items-center mb-1">
-                <label class="admin-label m-0">រូបភាព Banner (Optional)</label>
-                <span class="text-[10px] text-purple-400 font-semibold flex items-center gap-1">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                    <polyline points="21 15 16 10 5 21"></polyline>
-                  </svg>
-                  <span>Phone / PC Gallery</span>
-                </span>
+                <label class="admin-label m-0">ឯកសារភ្ជាប់ (Photo, Voice Note, ឬ Audio)</label>
+                <div class="flex items-center gap-2">
+                  <button type="button" id="recordVoiceBtn" onclick="toggleVoiceRecording()"
+                    class="text-[10px] bg-red-600/30 hover:bg-red-600/50 text-red-300 border border-red-500/40 px-2 py-0.5 rounded-full flex items-center gap-1 transition cursor-pointer">
+                    <span id="recordVoiceDot" class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                    <span id="recordVoiceText">ថតសំឡេង (Record Voice)</span>
+                  </button>
+                </div>
               </div>
 
-              <input type="hidden" id="broadcastPhotoInput">
+              <input type="hidden" id="broadcastMediaUrl">
+              <input type="hidden" id="broadcastMediaType" value="">
 
               <div id="broadcastUploadStage"
-                class="relative cursor-pointer border-2 border-dashed border-purple-500/40 hover:border-purple-400 bg-purple-950/20 hover:bg-purple-900/30 rounded-xl p-2.5 text-center transition flex flex-col items-center justify-center gap-1 mb-2 group overflow-hidden">
-                <input type="file" id="broadcastFileInput" accept="image/*"
+                class="relative cursor-pointer border-2 border-dashed border-purple-500/40 hover:border-purple-400 bg-purple-950/20 hover:bg-purple-900/30 rounded-xl p-3 text-center transition flex flex-col items-center justify-center gap-1 mb-2 group overflow-hidden">
+                <input type="file" id="broadcastFileInput" accept="image/*,audio/*"
                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
                   onchange="handleBroadcastFile(event)">
-                <div id="broadcastUploadEmpty" class="flex items-center justify-center gap-2 py-1 pointer-events-none">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    class="text-purple-300">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                    <polyline points="21 15 16 10 5 21"></polyline>
-                  </svg>
-                  <span class="text-xs font-bold text-white group-hover:text-purple-300">ចុចជ្រើសរើស Banner ពី Phone /
-                    PC</span>
+                <div id="broadcastUploadEmpty" class="flex flex-col items-center justify-center gap-1.5 py-1 pointer-events-none">
+                  <div class="flex items-center gap-2 text-purple-300">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                      <line x1="12" y1="19" x2="12" y2="23"></line>
+                      <line x1="8" y1="23" x2="16" y2="23"></line>
+                    </svg>
+                  </div>
+                  <span class="text-xs font-bold text-white group-hover:text-purple-300">ចុចជ្រើសរើស រូបភាព (Image) ឬ សំឡេង (Audio/Voice)</span>
+                  <span class="text-[10px] text-gray-400">គាំទ្រ: JPG, PNG, MP3, OGG, M4A, WAV</span>
                 </div>
                 <div id="broadcastPreviewWrap" class="hidden w-full flex flex-col items-center relative z-30">
                   <img id="broadcastPreviewImg" src="" alt="Banner Preview"
-                    class="w-full max-h-32 object-cover rounded-lg border border-purple-400 shadow-md">
-                  <button type="button" onclick="event.stopPropagation(); removeBroadcastUpload();"
-                    class="text-[9px] bg-red-600/60 hover:bg-red-600 text-white px-2 py-0.5 rounded border border-red-500/50 mt-1 cursor-pointer">លុប
-                    (Remove)</button>
+                    class="hidden w-full max-h-36 object-cover rounded-lg border border-purple-400 shadow-md mb-2">
+                  <audio id="broadcastPreviewAudio" src="" controls class="hidden w-full mb-2"></audio>
+                  <div class="flex items-center gap-2">
+                    <span id="broadcastMediaBadge" class="text-[10px] bg-purple-800 text-purple-200 px-2 py-0.5 rounded-full font-semibold"></span>
+                    <button type="button" onclick="event.stopPropagation(); removeBroadcastUpload();"
+                      class="text-[10px] bg-red-600/60 hover:bg-red-600 text-white px-2.5 py-0.5 rounded border border-red-500/50 cursor-pointer">លុប (Remove)</button>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <button type="submit" class="btn-admin-submit flex items-center justify-center gap-2">
+            <button type="submit" id="broadcastSubmitBtn" class="btn-admin-submit flex items-center justify-center gap-2">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M22 2L11 13"></path>
                 <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>

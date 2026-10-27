@@ -126,15 +126,82 @@ function stripTgEmoji(text) {
 
 /**
  * Creates an InlineKeyboardButton with colored style ('primary', 'success', 'danger')
+ * and premium animated custom emoji icon (icon_custom_emoji_id) without plain emojis
  */
-function makeBtn(text, extra = {}, style = 'primary') {
-  const validStyles = ['primary', 'success', 'danger'];
-  const safeStyle = validStyles.includes(style) ? style : 'primary';
-  return {
-    text: String(text).trim(),
+function makeBtn(text, extra = {}, style = 'primary', emojiKey = null) {
+  let safeStyle = style;
+  const rawText = String(text || '');
+
+  // Auto-detect danger style if not explicitly set
+  if (style === 'primary' && (/លុប|cancel|reject|បដិសេធ|del/i.test(rawText))) {
+    safeStyle = 'danger';
+  } else if (!['primary', 'success', 'danger'].includes(safeStyle)) {
+    safeStyle = 'primary';
+  }
+
+  // Auto-detect emoji key if not provided
+  let key = emojiKey || extra.emojiKey;
+  if (!key) {
+    if (/open store|store|ទំនិញ/i.test(rawText)) {
+      key = 'game';
+    } else if (/admin control|panel|control center/i.test(rawText)) {
+      key = 'gear';
+    } else if (/contact|support|ទាក់ទង admin/i.test(rawText)) {
+      key = 'support';
+    } else if (/reseller|vip/i.test(rawText)) {
+      key = 'crown';
+    } else if (/broadcast|ផ្សាយដំណឹង/i.test(rawText)) {
+      key = 'bell';
+    } else if (/stats|analytics|ស្ថិតិ/i.test(rawText)) {
+      key = 'chart';
+    } else if (/add product|បន្ថែមទំនិញ/i.test(rawText)) {
+      key = 'sparkle';
+    } else if (/manage products|បញ្ជីទំនិញ/i.test(rawText)) {
+      key = 'box';
+    } else if (/key/i.test(rawText)) {
+      key = 'key';
+    } else if (/back|ត្រឡប់/i.test(rawText)) {
+      key = 'pointer';
+    } else if (/accept|អនុម័ត/i.test(rawText)) {
+      key = 'verified';
+    } else if (/គ្រុប|group/i.test(rawText)) {
+      key = 'users';
+    } else if (/web/i.test(rawText)) {
+      key = 'rocket';
+    }
+  }
+
+  let customEmojiId = extra.icon_custom_emoji_id;
+  if (key && emojiConfig[key]?.id) {
+    customEmojiId = emojiConfig[key].id;
+  }
+
+  // Strip ALL unicode emojis from button text for a clean, premium look
+  let cleanText = rawText
+    .replace(/\p{Extended_Pictographic}/gu, '')
+    .replace(/[\uFE0E\uFE0F\u200D]/g, '')
+    .replace(/[\u{1D400}-\u{1D7FF}]/gu, char => {
+      // Convert mathematical bold letters if present back to standard ASCII
+      const code = char.codePointAt(0);
+      if (code >= 0x1D400 && code <= 0x1D419) return String.fromCharCode(code - 0x1D400 + 65);
+      if (code >= 0x1D41A && code <= 0x1D433) return String.fromCharCode(code - 0x1D41A + 97);
+      return char;
+    })
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const btn = {
+    text: cleanText || rawText.trim(),
     style: safeStyle,
     ...extra
   };
+
+  if (customEmojiId) {
+    btn.icon_custom_emoji_id = String(customEmojiId);
+  }
+
+  delete btn.emojiKey;
+  return btn;
 }
 
 module.exports = {
